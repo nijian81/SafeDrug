@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/xmlWhiteLineColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:id="@+id/portrait"
+        android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+        android:layout_height="@dimen/xmlPortraitHeight"
+        android:layout_width="@dimen/xmlPortraitWidth"
+        android:layout_toRightOf="@id/tx7"
+        android:src="@drawable/tx8" />
+
+    <TextView
+        android:id="@id/name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:text="aaa" />
+
+</LinearLayout>

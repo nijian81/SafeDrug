@@ -1,0 +1,703 @@
+package com.phhc.main;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.phhc.R;
+import com.phhc.drugAgenda.DrugAgendaFragment;
+import com.phhc.drugQuery.DrugQueryFragment;
+import com.phhc.drugRemind.DrugRemindFragment;
+import com.phhc.myAccount.AboutUsFragment;
+import com.phhc.myAccount.CompletePersonalInformationFragment;
+import com.phhc.myAccount.FamilyMemberManageFragment;
+import com.phhc.myAccount.LoginFragment;
+import com.phhc.myAccount.ModifyPasswordFragment;
+import com.phhc.myAccount.MyAccountFragment;
+import com.phhc.myAccount.RegisterFragment;
+import com.phhc.myAccount.SettingFragment;
+import com.phhc.service.AnonymityRegisterService;
+import com.phhc.utils.App;
+import com.phhc.utils.CreateSQLiteDatabase;
+import com.phhc.utils.DrugInfoTable;
+import com.phhc.utils.MemberInfoTable;
+import com.phhc.utils.TakeTimeTable;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+public class MainActivity extends FragmentActivity {
+
+    Boolean isCover;    //isCover代表是否需要覆盖一期版本。
+    ProgressDialog progressDialog;
+    String Login_flag;
+    int isLogin;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase dbBefore, dbAfter; //dbBefore网页版数据库，dbAfter原生数据库
+    MemberInfoTable memberInfoTable;
+    String databaseName, flag, userID, memberID, isFamily, nick, tel, sex, birth, photo, type, getup, breakfast, lunch, supper, sleep;
+    Button buttonOne, buttonTwo, buttonThree, buttonFour, button_register, button_registered_user_login;
+    RelativeLayout completePersonalInfo, memberManage, modifyPassword, existingAccountLogin, setting, opinionFeedback, aboutUs, register, exit;
+    MyAccountFragment myAccountFragment;
+    AboutUsFragment aboutUsFragment;
+    LoginFragment loginFragment;
+    
+    public RegisterFragment registerFragment;
+    ModifyPasswordFragment modifyPasswordFragment;
+    CompletePersonalInformationFragment completePersonalInformationFragment;
+    FamilyMemberManageFragment familyMemberManageFragment;
+    DrugQueryFragment drugQueryFragment;
+    SettingFragment settingFragment;
+    DrugRemindFragment drugRemindFragment;
+    DrugAgendaFragment drugAgendaFragment;
+    String userID_database;
+    SharedPreferences preferences;
+    DrugInfoTable drugInfoTable;
+    TakeTimeTable takeTimeTable;
+
+    String dataPath;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.main);
+
+        //测试应用使用次数
+        preferences = getSharedPreferences("count", MODE_PRIVATE);
+        int count = preferences.getInt("count", 0);
+        Toast.makeText(this, "程序以前被使用了" + count + "次。", Toast.LENGTH_LONG).show();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("count", ++count);
+        editor.commit();
+        //应用第一次加载,把一期的数据库文件导入原生的数据库中
+        if (count == 1) { 
+            //从数据库中查询数据
+            File f2 = new File("/data/data/com.phhc/databases/MedictionDataBase.db");
+            //首先判断应用是第一次安装还是第二次安装，如果是第一次安装跳过一下代码，如果是覆盖第一次的版本则执行以下代码。
+            if (f2.exists()) {
+                isCover = true;
+                String DB_PATH = "/data/data/com.phhc/databases/";
+                String DB_NAME = "MedictionDataBase.db";
+                dbBefore = SQLiteDatabase.openOrCreateDatabase(DB_PATH + DB_NAME, null);
+                //查询成员信息表，将成员信息表中的数据导出来到原生数据库中
+                String sql = "select * from MemberInfoTable";
+                Cursor cursor = dbBefore.rawQuery(sql, null);
+                databaseName = "LocalDrugMessage";
+                databaseHelper = new CreateSQLiteDatabase(this, databaseName, null, 1);
+                dbAfter = databaseHelper.getWritableDatabase();
+                while (cursor.moveToNext()) {
+                    memberInfoTable = new MemberInfoTable();
+                    memberInfoTable.setMemberID(cursor.getString(0));
+                    memberInfoTable.setName(cursor.getString(2));
+                    memberInfoTable.setIsFamily(cursor.getString(1));
+                    memberInfoTable.setPhoto(cursor.getString(6));
+                    memberInfoTable.setTel(cursor.getString(3));
+                    memberInfoTable.setSex(cursor.getString(4));
+                    memberInfoTable.setBirth(cursor.getString(5));
+                    memberInfoTable.setGetup(cursor.getString(7));
+                    memberInfoTable.setBreakfast(cursor.getString(8));
+                    memberInfoTable.setLunch(cursor.getString(9));
+                    memberInfoTable.setDinner(cursor.getString(10));
+                    memberInfoTable.setSleep(cursor.getString(11));
+                    memberInfoTable.setUpdateTime(cursor.getString(12));
+                    memberInfoTable.setUpdateState(cursor.getString(13));
+                    String sql5 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('" + memberInfoTable.getMemberID() + "','" + memberInfoTable.getName() + "','" + memberInfoTable.getIsFamily() + "','" + memberInfoTable.getPhoto() + "','" + memberInfoTable.getTel() + "','" + memberInfoTable.getSex() + "','" + memberInfoTable.getBirth() + "','" + memberInfoTable.getGetup() + "','" + memberInfoTable.getBreakfast() + "','" + memberInfoTable.getLunch() + "','" + memberInfoTable.getDinner() + "','" + memberInfoTable.getSleep() + "','" + memberInfoTable.getUpdateTime() + "','" + memberInfoTable.getUpdateState() + "')";
+                    dbAfter.execSQL(sql5);
+                }
+
+                //查询药品信息表，将药品信息表中的数据导出来到原生数据库中
+                String sql2 = "select * from DrugInfoTable";
+                Cursor cursor2 = dbBefore.rawQuery(sql2, null);
+                while (cursor2.moveToNext()) {
+                    drugInfoTable = new DrugInfoTable();
+                    drugInfoTable.setGuideDrugID(cursor2.getString(0));
+                    drugInfoTable.setUserID(cursor2.getString(1));
+                    drugInfoTable.setMemberID(cursor2.getString(2));
+                    drugInfoTable.setDrugID(cursor2.getString(3));
+                    drugInfoTable.setDrugName(cursor2.getString(4));
+                    drugInfoTable.setBeginDate(cursor2.getString(5));
+                    drugInfoTable.setEndDate(cursor2.getString(6));
+                    drugInfoTable.setNote(cursor2.getString(7));
+                    drugInfoTable.setUpdateTime(cursor2.getString(8));
+                    drugInfoTable.setUpdateState(cursor2.getString(9));
+                    String sql3 = "insert into DrugInfoTable (guideDrugID,userID,memberID,drugID,drugName,beginDate,endDate,note,updateTime,updateState)values('" + drugInfoTable.getGuideDrugID() + "','" + drugInfoTable.getUserID() + "','" + drugInfoTable.getMemberID() + "','" + drugInfoTable.getDrugID() + "','" + drugInfoTable.getDrugName() + "','" + drugInfoTable.getBeginDate() + "','" + drugInfoTable.getEndDate() + "','" + drugInfoTable.getNote() + "','" + drugInfoTable.getUpdateTime() + "','" + drugInfoTable.getUpdateState() + "')";
+                    dbAfter.execSQL(sql3);
+                }
+
+                //查询服药时间表，将服药时间表中的数据导出来到原生数据库中
+                String sql3 = "select * from TakeTimeTable";
+                Cursor cursor3 = dbBefore.rawQuery(sql3, null);
+                while (cursor3.moveToNext()) {
+                    takeTimeTable = new TakeTimeTable();
+                    takeTimeTable.setDrugID(cursor3.getString(0));
+                    takeTimeTable.setGuideDrugID(cursor3.getString(1));
+                    takeTimeTable.setMemberID(cursor3.getString(2));
+                    takeTimeTable.setDrugName(cursor3.getString(3));
+                    takeTimeTable.setDate(cursor3.getString(4));
+                    takeTimeTable.setTime(cursor3.getString(5));
+                    takeTimeTable.setConfirmState(cursor3.getString(6));
+                    takeTimeTable.setConfirmTime(cursor3.getString(7));
+                    takeTimeTable.setCycle(cursor3.getString(8));
+                    takeTimeTable.setFreq(cursor3.getString(9));
+                    takeTimeTable.setDose(cursor3.getString(10));
+                    takeTimeTable.setDoseUnit(cursor3.getString(11));
+                    takeTimeTable.setCondition(cursor3.getString(12));
+                    takeTimeTable.setUpdateTime(cursor3.getString(13));
+                    takeTimeTable.setUpdateState(cursor3.getString(14));
+                    String sql4 = "insert into TakeTimeTable (drugID,guideDrugID,memberID,drugName,date,time,ConfirmStates,ConfirmTime,cycle,freq,dose,doseUnit,condition,updateTime,updateState)values('" + takeTimeTable.getDrugID() + "','" + takeTimeTable.getGuideDrugID() + "','" + takeTimeTable.getMemberID() + "','" + takeTimeTable.getDrugName() + "','" + takeTimeTable.getDate() + "','" + takeTimeTable.getTime() + "','" + takeTimeTable.getConfirmState() + "','" + takeTimeTable.getConfirmTime() + "','" + takeTimeTable.getCycle() + "','" + takeTimeTable.getFreq() + "','" + takeTimeTable.getDose() + "','" + takeTimeTable.getDoseUnit() + "','" + takeTimeTable.getCondition() + "','" + takeTimeTable.getUpdateTime() + "','" + takeTimeTable.getUpdateState() + "')";
+                    dbAfter.execSQL(sql4);
+                }
+                dbBefore.close();
+            } else {
+                isCover = false;
+
+            }
+        } else {
+            //应用第二次加载，不需要做处理
+
+        }
+        databaseName = "LocalDrugMessage";
+        databaseHelper = new CreateSQLiteDatabase(this, databaseName, null, 1);
+        //默认初始化为未登录状态，登录状态位为0
+        dbAfter = databaseHelper.getWritableDatabase();
+//        Intent intent = new Intent(this, AnonymityRegisterService.class);
+//        startService(intent);
+        try {
+            String sql = "select * from anonymityRegister";
+            Cursor cursor = dbAfter.rawQuery(sql, null);
+            while (cursor.moveToNext()) {
+                userID_database = cursor.getString(3);
+            }
+            //如果标志flag为0则让其匿名注册，如果flag为1则拒绝匿名注册。
+            if (userID_database.length() == 0) {
+                AnonymityRegister anonymityRegister = new AnonymityRegister();
+                progressDialog = ProgressDialog.show(this, null, "数据加载中，请稍后...");
+                anonymityRegister.execute();
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+
+        }
+        String sql6 = "select * from anonymityRegister";
+        Cursor cursor6 = dbAfter.rawQuery(sql6, null);
+        while (cursor6.moveToNext()) {
+            flag = cursor6.getString(8);
+            Login_flag = cursor6.getString(7);
+            userID_database = cursor6.getString(3);
+        }
+
+
+        //第一期的逻辑是将本地数据全部上传
+        //第二期的逻辑是只上传更新的数据
+        //此次版本的逻辑是将本地数据全部上传
+        //flag = 1表示已经登录
+        if (Login_flag.equals("1")) {
+            String sql2 = "select * from MemberInfoTable";
+            Cursor cursor2 = dbAfter.rawQuery(sql2, null);
+            //是否更新数据的标志位,updateState。如果为1则上传服务器数据，如果为0则不用更新
+            String updateState;
+            while (cursor2.moveToNext()) {
+                updateState = cursor2.getString(13);
+                if (updateState.equals("1")) {
+                    new Upload().execute();
+                    break;
+                }
+            }
+        }
+        //将外部数据库导入到手机中
+        File file = new File("/data/data/com.phhc/databases/", "drug_info");
+        if (!file.exists()) {
+            try {
+                InputStream in = getResources().openRawResource(R.raw.drug_info);
+                FileOutputStream out = new FileOutputStream(file);
+                int n;
+                byte a[] = new byte[1024];
+                while ((n = in.read(a)) != -1) {
+                    out.write(a, 0, n);
+                }
+                out.close();
+                in.close();
+            } catch (IOException exp) {
+            }
+        }
+        buttonOne = (Button) findViewById(R.id.buttonOne);
+        buttonTwo = (Button) findViewById(R.id.buttonTwo);
+        buttonThree = (Button) findViewById(R.id.buttonThree);
+        buttonFour = (Button) findViewById(R.id.buttonFour);
+        //将初始视图定位到用药提醒
+        changeTab(buttonOne);
+    }
+
+    //匿名注册接口 尼见 2015-04-13
+    class AnonymityRegister extends AsyncTask<Object, Object, Object> {
+
+        @Override
+        protected Objects doInBackground(Object... params) {
+            //声明网址字符串
+            App app = (App) getApplication();
+            String uriAPI = app.getInterfaceUrl() + "guarder/api/user/AddUser";
+            //创建http post连接
+            //post运行变量必须用NameValuePair[]数组存储
+            HttpPost httpRequest = new HttpPost(uriAPI);
+            List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+            final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+            final String tmDevice, tmSerial, androidId;
+            tmDevice = "" + tm.getDeviceId();
+            tmSerial = "" + tm.getSimSerialNumber();
+            androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+            UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+            String deviceId = deviceUuid.toString();
+
+            params1.add(new BasicNameValuePair("dtype", "a"));
+            params1.add(new BasicNameValuePair("device", deviceId));
+            try {
+                //发出http request
+                httpRequest.setEntity(new UrlEncodedFormEntity(params1, HTTP.UTF_8));
+                //取得http response
+                HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+                //若状态码为200 ok
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    String strResult = EntityUtils.toString(httpResponse.getEntity());
+                    JSONObject jsonObject = new JSONObject(strResult);
+                    JSONObject jsonObjectData = jsonObject.getJSONObject("data");
+                    //成功接受到服务器返回数据之后，结束进度等待窗口
+                    progressDialog.dismiss();
+                    for (int i = 0; i < jsonObjectData.length(); i++) {
+                        String sysUser_ID = jsonObjectData.getString("sysUser_ID");
+                        dbAfter = databaseHelper.getWritableDatabase();
+                        String sql = "update anonymityRegister set sys_userID ='" + sysUser_ID + "',uuid ='" + deviceId + "',current_member_id ='" + sysUser_ID + "',current_member_portrait ='" + "tx1" + "',current_member_name ='" + "自己" + "'";
+                        dbAfter.execSQL(sql);
+                        if (isCover == false) {
+                            String sql7 = "select * from anonymityRegister";
+                            Cursor cursor7 = dbAfter.rawQuery(sql7, null);
+                            while (cursor7.moveToNext()) {
+                                userID_database = cursor7.getString(3);
+                            }
+                            String sql5 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('" + userID_database + "','" + "自己" + "','" + "1" + "','" + "tx1" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "','" + "" + "')";
+                            dbAfter.execSQL(sql5);
+                        }
+//                        String sql2 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values('" + sysUser_ID + "','" + "自己" + "','" + "1" + "','" + "tx4" + "','" + "" + "','" + "男" + "','" + "" + "','" + "07:00" + "','" + "07:30" + "','" + "12:00" + "','" + "18:00" + "','" + "22:00" + "','" + "" + "','" + "0" + "')";
+//                        db.execSQL(sql2);
+                    }
+                } else {
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    //上行接口同步数据，注意联网程序必须写在异步任务中，否则会报异常 尼见 2015-03-16
+    class Upload extends AsyncTask<Object, Object, Object> {
+
+        @Override
+        protected Objects doInBackground(Object... params) {
+
+            //声明网址字符串
+            App app = (App) getApplication();
+            String uriAPI = app.getInterfaceUrl() + "guarder/api/user/SynchSet";
+            //查询本手机的UUID
+            dbAfter = databaseHelper.getWritableDatabase();
+            String sql3 = "select * from anonymityRegister";
+            Cursor cursor3 = dbAfter.rawQuery(sql3, null);
+            while (cursor3.moveToNext()) {
+                userID = cursor3.getString(3);
+            }
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date curDate = new Date(System.currentTimeMillis());
+            String localTimeStamp = formatter.format(curDate);
+            String sql4 = "select * from MemberInfoTable";
+            Cursor cursor4 = dbAfter.rawQuery(sql4, null);
+            JSONArray jsonArrayMemberList = new JSONArray();
+            JSONObject jsonObjectMember = new JSONObject();
+            int i = 0;
+            int j = 0;
+            String memberListArray = "[{";
+            while (cursor4.moveToNext()) {
+                memberID = cursor4.getString(0);
+                isFamily = cursor4.getString(2);
+                nick = cursor4.getString(1);
+                tel = cursor4.getString(4);
+                sex = cursor4.getString(5);
+                birth = cursor4.getString(6);
+                getup = cursor4.getString(7);
+                breakfast = cursor4.getString(8);
+                lunch = cursor4.getString(9);
+                supper = cursor4.getString(10);
+                sleep = cursor4.getString(11);
+                try {
+                    jsonObjectMember.put("memberID", memberID);
+                    jsonObjectMember.put("isFamily", isFamily);
+                    jsonObjectMember.put("nick", nick);
+                    jsonObjectMember.put("tel", tel);
+                    jsonObjectMember.put("sex", sex);
+                    jsonObjectMember.put("birth", birth);
+                    jsonObjectMember.put("photo", photo);
+                    jsonObjectMember.put("type", "");
+                    JSONObject jsonObjectRelaxTime = new JSONObject();
+                    jsonObjectRelaxTime.put("getup", getup);
+                    jsonObjectRelaxTime.put("breakfast", breakfast);
+                    jsonObjectRelaxTime.put("lunch", lunch);
+                    jsonObjectRelaxTime.put("supper", supper);
+                    jsonObjectRelaxTime.put("sleep", sleep);
+                    jsonObjectMember.put("restTime", jsonObjectRelaxTime);
+                    jsonArrayMemberList.put(i++, jsonObjectMember + "1" + j++);
+                    memberListArray.concat("memberID" + ":'" + memberID + "'," + "isFamily" + ":'" + isFamily + "'," + "nick" + ":'" + nick + "'," + "tel" + ":'" + tel + "'," + "sex" + ":'" + sex + "'," + "birth" + ":'" + birth + "'," + "photo" + ":'" + photo + "'," + "type" + ":'" + type + "'," + "restTime" + ":{" + "lunch" + ":'" + lunch + "'," + "getup" + ":'" + getup + "'," + "sleep" + ":'" + sleep + "'," + "breakfast" + ":'" + breakfast + "'," + "supper" + ":'" + supper + "'}}|{");
+                } catch (Exception e) {
+                }
+            }
+            try {
+                jsonArrayMemberList.get(0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //创建http post连接
+            //post运行变量必须用NameValuePair[]数组存储
+            JSONArray memberList = new JSONArray();
+            HttpPost httpRequest = new HttpPost(uriAPI);
+            List<JSONArray> params2 = new ArrayList<>();
+            List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+            params2.add(jsonArrayMemberList);
+            params1.add(new BasicNameValuePair("userID", userID));
+            params1.add(new BasicNameValuePair("latestSynch", "2015-03-10 00:00:00"));
+
+            params1.add(new BasicNameValuePair("memberList", "[{\"memberID\":\"02f5e89d-10da-4581-931c-c9652a855e00\",\"type\":\"\",\"isFamily\":\"1\",\"tel\":\"13699148691\",\"sex\":\"0\",\"birth\":\"\",\"photo\":\"tx1\",\"restTime\":{\"getup\":null,\"breakfast\":null,\"lunch\":null,\"supper\":null,\"sleep\":null}}]"));
+//            try {
+//                params1.add(new BasicNameValuePair("memberList", jsonArrayMemberList.get(0).toString() + jsonArrayMemberList.get(1).toString()));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+            params1.add(new BasicNameValuePair("drugList", ""));
+            params1.add(new BasicNameValuePair("takeTimeList", ""));
+            try {
+                //发出http request
+                httpRequest.setEntity(new UrlEncodedFormEntity(params1, HTTP.UTF_8));
+                //取得http response
+                HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    String strResult2 = EntityUtils.toString(httpResponse.getEntity());
+                    JSONObject jsonObject2 = new JSONObject(strResult2);
+                    JSONArray jsonArray2 = jsonObject2.getJSONArray("memberLists");
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return null;
+        }
+    }
+
+    //控制底部切换页面的四个button 尼见 2015-04-13
+    public void changeTab(View view) {
+
+        if (view == buttonOne) {
+            buttonOne.setBackgroundResource(R.drawable.yytxb);
+            buttonTwo.setBackgroundResource(R.drawable.yyrc);
+            buttonThree.setBackgroundResource(R.drawable.ypcx);
+            buttonFour.setBackgroundResource(R.drawable.wdzh);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            drugRemindFragment = new DrugRemindFragment();
+            fragmentTransaction.replace(R.id.login_fragment, drugRemindFragment, "drugRemindFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+
+        if (view == buttonTwo) {
+            buttonOne.setBackgroundResource(R.drawable.yytx);
+            buttonTwo.setBackgroundResource(R.drawable.yyrcb);
+            buttonThree.setBackgroundResource(R.drawable.ypcx);
+            buttonFour.setBackgroundResource(R.drawable.wdzh);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            drugAgendaFragment = new DrugAgendaFragment();
+            fragmentTransaction.replace(R.id.login_fragment, drugAgendaFragment, "drugAgendaFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+
+        if (view == buttonThree) {
+            buttonOne.setBackgroundResource(R.drawable.yytx);
+            buttonTwo.setBackgroundResource(R.drawable.yyrc);
+            buttonThree.setBackgroundResource(R.drawable.ypcxb);
+            buttonFour.setBackgroundResource(R.drawable.wdzh);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            drugQueryFragment = new DrugQueryFragment();
+            fragmentTransaction.replace(R.id.login_fragment, drugQueryFragment, "drugQueryFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+
+        if (view == buttonFour) {
+            buttonOne.setBackgroundResource(R.drawable.yytx);
+            buttonTwo.setBackgroundResource(R.drawable.yyrc);
+            buttonThree.setBackgroundResource(R.drawable.ypcx);
+            buttonFour.setBackgroundResource(R.drawable.wdzhb);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            myAccountFragment = new MyAccountFragment();
+            Bundle bundle = new Bundle();
+            String sql = "select * from anonymityRegister";
+            dbAfter = databaseHelper.getWritableDatabase();
+            Cursor cursor = dbAfter.rawQuery(sql, null);
+            int flag_database = 0;
+            while (cursor.moveToNext()) {
+                flag_database = cursor.getInt(7);
+            }
+            dbAfter.close();
+            bundle.putInt("flag", flag_database);
+            myAccountFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.login_fragment, myAccountFragment, "myAccountFragment");
+            fragmentTransaction.commit();
+        }
+
+    }
+
+    //是其他的xml文件对应方法
+    public void login(View view) {
+
+        button_registered_user_login = (Button) findViewById(R.id.registered_user_login);
+        button_register = (Button) findViewById(R.id.button_register);
+
+        //注册页面中点击已有账户登录跳转会登录界面
+        if (view == button_registered_user_login) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            loginFragment = new LoginFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, loginFragment, "loginFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+            return;
+        }
+        //登录页面中点击注册按钮跳转到注册界面
+        if (view == button_register) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            registerFragment = new RegisterFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, registerFragment, "registerFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+            return;
+        }
+        try {
+            dbAfter = databaseHelper.getWritableDatabase();
+            String sql = "select * from anonymityRegister";
+            Cursor cursor = dbAfter.rawQuery(sql, null);
+            while (cursor.moveToNext()) {
+                isLogin = cursor.getInt(7);
+            }
+            //如果标志flag为0则让其匿名注册，如果flag为1则拒绝匿名注册。
+            if (isLogin == 1) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                myAccountFragment = new MyAccountFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("flag", 1);
+                myAccountFragment.setArguments(bundle);
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                fragmentTransaction.replace(R.id.login_fragment, myAccountFragment, "myAccountFragment");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            } else {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                myAccountFragment = new MyAccountFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("flag", 0);
+                myAccountFragment.setArguments(bundle);
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                fragmentTransaction.replace(R.id.login_fragment, myAccountFragment, "myAccountFragment");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+            dbAfter.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    //是我的账户xml文件对应的方法
+    public void changePage(View view) {
+
+        completePersonalInfo = (RelativeLayout) findViewById(R.id.completePersonalInfo);
+        memberManage = (RelativeLayout) findViewById(R.id.memberManage);
+        modifyPassword = (RelativeLayout) findViewById(R.id.password_modify_relative_layout);
+        existingAccountLogin = (RelativeLayout) findViewById(R.id.existingAccountLogin);
+        setting = (RelativeLayout) findViewById(R.id.setting);
+        opinionFeedback = (RelativeLayout) findViewById(R.id.opinionFeedback);
+        aboutUs = (RelativeLayout) findViewById(R.id.aboutUs);
+        register = (RelativeLayout) findViewById(R.id.register);
+        exit = (RelativeLayout) findViewById(R.id.exit);
+
+        if (view == completePersonalInfo) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            completePersonalInformationFragment = new CompletePersonalInformationFragment();
+            Bundle bundle = new Bundle();
+            //设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+            bundle.putInt("isMyself", 1);
+            completePersonalInformationFragment.setArguments(bundle);
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, completePersonalInformationFragment, "completePersonalInformationFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == memberManage) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            familyMemberManageFragment = new FamilyMemberManageFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, familyMemberManageFragment, "familyMemberManageFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == modifyPassword) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            modifyPasswordFragment = new ModifyPasswordFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, modifyPasswordFragment, "modifyPasswordFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == setting) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            settingFragment = new SettingFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, settingFragment, "settingFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == opinionFeedback) {
+            System.out.println("意见反馈按钮被点击了");
+        }
+        if (view == aboutUs) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            aboutUsFragment = new AboutUsFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, aboutUsFragment, "aboutUsFragment");
+//            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == register) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            registerFragment = new RegisterFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, registerFragment, "registerFragment");
+//            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == existingAccountLogin) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            loginFragment = new LoginFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, loginFragment, "loginFragment");
+//            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+        if (view == exit) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            myAccountFragment = new MyAccountFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("flag", 0);
+            try {
+                dbAfter = databaseHelper.getWritableDatabase();
+                String sql = "update anonymityRegister set isLogin = '0'";
+                dbAfter.execSQL(sql);
+                String sql3 = "delete from MemberInfoTable";
+                dbAfter.execSQL(sql3);
+                String sql4 = "update anonymityRegister set sys_userID = ''";
+                dbAfter.execSQL(sql4);
+                dbAfter.close();  
+                //这个逻辑不对，以后在修改。
+                Intent intent = new Intent(this, AnonymityRegisterService.class);
+                startService(intent);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            myAccountFragment.setArguments(bundle);
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, myAccountFragment, "myAccountFragment");
+//            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //提示用户是否更新服务器端数据 尼见 2015-02-28
+    AlertDialog getAlertDialogWithWhetherUpdate() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,
+                android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+        builder.setTitle("提示");
+        builder.setMessage("您输入的手机号不正确");
+        builder.setPositiveButton("确定", null);
+        builder.setCancelable(false);
+        android.app.AlertDialog dialog = builder.create();
+        return dialog;
+
+    }
+
+}

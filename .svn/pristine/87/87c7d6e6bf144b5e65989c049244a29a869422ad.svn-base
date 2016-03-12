@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <ImageView
+            android:id="@+id/back_drug_detail"
+            android:layout_height="@dimen/xmlTopLeftIconHeight"
+            android:layout_width="@dimen/xmlTopLeftIconWidth"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/xmlTopLeftIconMargin"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/fanhui" />
+
+        <ImageView
+            android:id="@+id/check_more"
+            android:layout_height="25dp"
+            android:layout_width="25dp"
+            android:layout_toLeftOf="@+id/change_size"
+            android:layout_marginRight="@dimen/xmlTopLeftIconMargin"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/check_more_off" />
+
+        <ImageView
+            android:id="@+id/change_size"
+            android:layout_height="25dp"
+            android:layout_width="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlTopLeftIconMargin"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/word" />
+    </RelativeLayout>
+
+    <WebView
+        android:id="@+id/drugDetailWebView"
+        android:layout_height="@dimen/xmlAboutUsMiddleHeight"
+        android:layout_width="match_parent" />
+
+</LinearLayout>

@@ -1,0 +1,128 @@
+package cn.com.phhc.drugSafeApp.drugQuery;
+
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ImageView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.App;
+import cn.com.phhc.drugSafeApp.utils.DrugItem;
+
+public class DrugDetailFragment extends Fragment {
+
+    SelectCompanyDialogFragment selectCompanyDialogFragment;
+    DrugQueryFragment drugQueryFragment;
+    ImageView back_drug_detail, change_size, check_more;
+    WebView drugDetailWebView;
+    String productDrugId, basicDrugId;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.drug_detail_fragment, container, false);
+
+        //检查更多
+        check_more = (ImageView) rootView.findViewById(R.id.check_more);
+        check_more.setOnClickListener(new MyClickSelectMoreListener());
+        productDrugId = getArguments().getString("productDrugId");
+        basicDrugId = getArguments().getString("basicDrugId");
+        back_drug_detail = (ImageView) rootView.findViewById(R.id.back_drug_detail);
+        back_drug_detail.setOnClickListener(new MyClickBackDrugQueryListener());
+        change_size = (ImageView) rootView.findViewById(R.id.change_size);
+        drugDetailWebView = (WebView) rootView.findViewById(R.id.drugDetailWebView);
+        drugDetailWebView.setWebViewClient(new WebViewClient());
+        WebSettings webSettings = drugDetailWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setDefaultTextEncodingName("utf-8");
+        App app = (App)getActivity().getApplication();
+        String url = app.getInterfaceUrl()+"guarder/getDurgInstructions?productID=" + productDrugId + "&basicID=" + basicDrugId;
+        drugDetailWebView.loadUrl(url);
+
+        return rootView;
+
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+    //点击返回监视器 尼见 2015-03-17
+    class MyClickBackDrugQueryListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            drugQueryFragment = new DrugQueryFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+            fragmentTransaction.replace(R.id.login_fragment, drugQueryFragment, "drugQueryFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //点击选择更多监视器 尼见 2015-03-17
+    class MyClickSelectMoreListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            selectCompanyDialogFragment = SelectCompanyDialogFragment.newInstance(1);
+            selectCompanyDialogFragment.setConfirmInterface(new SelectCompanyDialogFragment.ConfirmInterface() {
+
+                //接口回调实现通信
+                @Override
+                public void onConfirmInterface(String productDrugId, String basicDrugId) {
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager
+                            .beginTransaction();
+                    DrugDetailFragment drugDetailFragment = new DrugDetailFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("productDrugId", productDrugId);
+                    bundle.putString("basicDrugId", basicDrugId);
+                    drugDetailFragment.setArguments(bundle);
+                    fragmentTransaction.replace(R.id.login_fragment, drugDetailFragment, "drugDetailFragment");
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+            });
+            Bundle bundle = new Bundle();
+            bundle.putString("productDrugId", productDrugId);
+            bundle.putString("basicDrugId", basicDrugId);
+            selectCompanyDialogFragment.setArguments(bundle);
+            selectCompanyDialogFragment.show(getActivity().getFragmentManager(), "changeSexDialogFragment");
+
+        }
+    }
+}

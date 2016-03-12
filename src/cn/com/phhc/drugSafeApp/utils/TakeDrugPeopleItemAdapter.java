@@ -1,0 +1,135 @@
+package cn.com.phhc.drugSafeApp.utils;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+
+import java.util.ArrayList;
+
+/**
+ * Created by lenovo on 2015/3/9.
+ * 服药人项适配器
+ */
+public class TakeDrugPeopleItemAdapter extends BaseAdapter {
+
+    ArrayList<MemberItem> list;
+    Context context;
+
+    @Override
+    public int getCount() {
+
+        return list.size();
+
+    }
+
+    @Override
+    public MemberItem getItem(int position) {
+
+        MemberItem memberItem = list.get(position);
+
+        return memberItem;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        ViewHolder viewHolder = null;
+
+
+        viewHolder = new ViewHolder();
+        convertView = LayoutInflater.from(context).inflate(R.layout.take_drug_people_item, null);
+        viewHolder.portrait = (ImageView) convertView.findViewById(R.id.portrait);
+        viewHolder.name = (TextView) convertView.findViewById(R.id.name);
+        String portrait = this.list.get(position).getPortrait();
+        switch (portrait) {
+            case "tx1":
+                viewHolder.portrait.setImageResource(R.drawable.tx1);
+                break;
+            case "tx2":
+                viewHolder.portrait.setImageResource(R.drawable.tx2);
+                break;
+            case "tx3":
+                viewHolder.portrait.setImageResource(R.drawable.tx3);
+                break;
+            case "tx4":
+                viewHolder.portrait.setImageResource(R.drawable.tx4);
+                break;
+            case "tx5":
+                viewHolder.portrait.setImageResource(R.drawable.tx5);
+                break;
+            case "tx6":
+                viewHolder.portrait.setImageResource(R.drawable.tx6);
+                break;
+            case "tx7":
+                viewHolder.portrait.setImageResource(R.drawable.tx7);
+                break;
+            case "tx8":
+                viewHolder.portrait.setImageResource(R.drawable.tx8);
+                break;
+            case "xz1":
+                viewHolder.portrait.setImageResource(R.drawable.xz1);
+                break;
+            case "xz2":
+                viewHolder.portrait.setImageResource(R.drawable.xz2);
+                break;
+            case "xz3":
+                viewHolder.portrait.setImageResource(R.drawable.xz3);
+                break;
+            case "xz4":
+                viewHolder.portrait.setImageResource(R.drawable.xz4);
+                break;
+            case "xz5":
+                viewHolder.portrait.setImageResource(R.drawable.xz5);
+                break;
+            case "xz6":
+                viewHolder.portrait.setImageResource(R.drawable.xz6);
+                break;
+            case "xz7":
+                viewHolder.portrait.setImageResource(R.drawable.xz7);
+                break;
+            case "xz8":
+                viewHolder.portrait.setImageResource(R.drawable.xz8);
+                break;
+            default:
+                viewHolder.portrait.setImageResource(R.drawable.tx4);
+                break;
+        }
+        viewHolder.name.setText(this.list.get(position).getName());
+        return convertView;
+    }
+
+    final static class ViewHolder {
+        ImageView portrait;
+        TextView name;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public void setArrayList(ArrayList<MemberItem> list) {
+        this.list = list;
+    }
+
+    public void updateListView(ArrayList<MemberItem> list) {
+        this.list = list;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
+}

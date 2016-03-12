@@ -1,0 +1,108 @@
+package cn.com.phhc.drugSafeApp.drugRemind;
+
+import android.app.DialogFragment;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+
+import cn.com.phhc.drugSafeApp.R;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class SelectAddDrugMethodDialogFragment extends DialogFragment {
+
+    ConfirmInterface listener;
+    RelativeLayout scan, manualAdd;
+
+    public static SelectAddDrugMethodDialogFragment newInstance(String sex) {
+        SelectAddDrugMethodDialogFragment frag = new SelectAddDrugMethodDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("sex", sex);
+        frag.setArguments(args);
+        return frag;
+    }
+
+    public interface ConfirmInterface {
+        public void onConfirmInterface(String method);
+    }
+
+    public void setConfirmInterface(ConfirmInterface listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.select_add_drug_method_dialog, container, false);
+
+        //扫一扫
+        scan = (RelativeLayout)rootView.findViewById(R.id.scan);
+        scan.setOnClickListener(new MyClickScanListener());
+        //手工添加
+        manualAdd = (RelativeLayout)rootView.findViewById(R.id.manualAdd);
+        manualAdd.setOnClickListener(new MyClickManualAddListener());
+        Window window = getDialog().getWindow();
+        // set "origin" to top left corner, so to speak
+        window.setGravity(Gravity.TOP|Gravity.RIGHT);
+        // after that, setting values for x and y works "naturally"
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.x = 100;
+        params.y = 100;
+        window.setAttributes(params);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    //点击扫一扫监视器 尼见 2015-03-03
+    class MyClickScanListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            String method = "scan";
+            listener.onConfirmInterface(method);
+            dismiss();
+        }
+    }
+
+    //点击手动添加监视器 尼见 2015-03-03
+    class MyClickManualAddListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            String method = "manual";
+            listener.onConfirmInterface(method);
+            getActivity();
+            dismiss();
+        }
+    }
+
+}

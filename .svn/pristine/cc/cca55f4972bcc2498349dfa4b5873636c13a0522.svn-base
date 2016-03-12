@@ -1,0 +1,1218 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.App;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.JudgeNetworkState;
+import cn.com.phhc.drugSafeApp.utils.PersonalInformation;
+
+public class AddMemberInformationFragment extends Fragment {
+
+	ProgressDialog progressDialog;
+	String selfHoneyName;
+	Boolean isNeedToSave = false; // 是否需要去保存，“true”表示需要保存，“false”表示不需要保存
+	ArrayList<PersonalInformation> list, listFromRelaxTime;
+	PersonalInformation personalInformation;
+	String sysUserID = null;
+	ImageButton back;
+	FamilyMemberManageFragment familyMemberManageFragment;
+	MyAccountFragment myAccountFragment;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName, portrait_database = "", honeyName_database = "",
+			sex_database = "", cellphoneNum_database = "",
+			birthday_database = "";
+	TextView text_under_portrait, honey_name_text_view, sex_text_view,
+			cellphone_text_view, birthday_text_view, save, title;
+	ImageView portraitImage;
+	RelativeLayout portrait, honey_name, sex, cellphone, birthday, relax_time;
+	int year_database, month_database, day_database;
+	int isMySelf;
+	// 以下的参数用于和数据库做对比，来提示用户是否保存
+	String getupTimeParam = "", breakfastTimeParam = "", lunchTimeParam = "",
+			dinnerTimeParam = "", sleepTimeParam = "";
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		db = databaseHelper.getWritableDatabase();
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.add_member_information,
+				container, false);
+
+		Bundle bundle = this.getArguments();
+		// isMySelf字段相当于数据库中isFamily
+		isMySelf = bundle.getInt("isMyself");
+		// 初始化个人信息的实体
+		personalInformation = new PersonalInformation();
+		listFromRelaxTime = new ArrayList<>();
+		if (isMySelf == 0) {
+			personalInformation.setPortrait("");
+			personalInformation.setHoneyName("");
+			personalInformation.setSex("");
+			personalInformation.setCellphone("");
+			personalInformation.setBirthday("");
+			personalInformation.setGetupTime("");
+			personalInformation.setBreakfastTime("");
+			personalInformation.setLunchTime("");
+			personalInformation.setDinnerTime("");
+			personalInformation.setSleepTime("");
+		}
+		list = new ArrayList<>();
+		list.add(personalInformation);
+		if (bundle.getCharSequenceArrayList("PersonalInformation") != null) {
+			list = (ArrayList) bundle
+					.getCharSequenceArrayList("PersonalInformation");
+		}
+		// 标题
+		title = (TextView) rootView.findViewById(R.id.title);
+		// 返回
+		back = (ImageButton) rootView.findViewById(R.id.back);
+		back.setOnClickListener(new MyClickBackListener());
+		// 头像
+		portrait = (RelativeLayout) rootView.findViewById(R.id.portrait);
+		portrait.setOnClickListener(new MyClickPortraitListener());
+		portraitImage = (ImageView) rootView.findViewById(R.id.portrait_image);
+		// 昵称
+		honey_name = (RelativeLayout) rootView.findViewById(R.id.honey_name);
+		honey_name.setOnClickListener(new MyClickHoneyNameListener());
+		honey_name_text_view = (TextView) rootView
+				.findViewById(R.id.honey_name_edit_text);
+		text_under_portrait = (TextView) rootView
+				.findViewById(R.id.text_under_portrait);
+		// 性别
+		sex = (RelativeLayout) rootView.findViewById(R.id.sex);
+		sex.setOnClickListener(new MyClickSexListener());
+		sex_text_view = (TextView) rootView.findViewById(R.id.sex_text_view);
+		// 手机号
+		cellphone = (RelativeLayout) rootView.findViewById(R.id.cellphone);
+		cellphone.setOnClickListener(new MyClickCellphoneNumListener());
+		cellphone_text_view = (TextView) rootView
+				.findViewById(R.id.cellphone_text_view);
+		// 生日
+		birthday = (RelativeLayout) rootView.findViewById(R.id.birthday);
+		birthday.setOnClickListener(new MyClickBirthdayListener());
+		birthday_text_view = (TextView) rootView
+				.findViewById(R.id.birthday_text_view);
+		// 作息时间
+		relax_time = (RelativeLayout) rootView.findViewById(R.id.relax_time);
+		relax_time.setOnClickListener(new MyClickRelaxTimeListener());
+		// 保存
+		save = (TextView) rootView.findViewById(R.id.save);
+		save.setOnClickListener(new MyClickSaveListener());
+		// 根据list的内容去动态更新视图
+		if (list.get(0).getHoneyName().length() != 0) {
+			honey_name_text_view.setText(list.get(0).getHoneyName());
+			text_under_portrait.setText(list.get(0).getHoneyName());
+			honeyName_database = list.get(0).getHoneyName();
+		}
+		if (list.get(0).getSex().length() != 0) {
+			sex_text_view.setText(list.get(0).getSex());
+			sex_database = list.get(0).getSex();
+		}
+		if (list.get(0).getCellphone().length() != 0) {
+			cellphone_text_view.setText(list.get(0).getCellphone());
+			cellphoneNum_database = list.get(0).getCellphone();
+		}
+		if (list.get(0).getBirthday().length() != 0) {
+			birthday_text_view.setText(list.get(0).getBirthday());
+			birthday_database = list.get(0).getBirthday();
+		}
+		if(list.get(0).getPortrait().length() != 0){
+			switch (list.get(0).getPortrait()) {
+			case "tx1":
+				portraitImage.setImageResource(R.drawable.tx1);
+				break;
+			case "tx2":
+				portraitImage.setImageResource(R.drawable.tx2);
+				break;
+			case "tx3":
+				portraitImage.setImageResource(R.drawable.tx3);
+				break;
+			case "tx4":
+				portraitImage.setImageResource(R.drawable.tx4);
+				break;
+			case "tx5":
+				portraitImage.setImageResource(R.drawable.tx5);
+				break;
+			case "tx6":
+				portraitImage.setImageResource(R.drawable.tx6);
+				break;
+			case "tx7":
+				portraitImage.setImageResource(R.drawable.tx7);
+				break;
+			case "tx8":
+				portraitImage.setImageResource(R.drawable.tx8);
+				break;
+			default:
+				portraitImage.setImageResource(R.drawable.tx4);
+			}
+			portrait_database = list.get(0).getPortrait();
+		}
+		
+		
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	// 点击头像监视器 尼见 2015-03-03
+	class MyClickPortraitListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			SelectPortraitDialogFragment selectPortraitDialogFragment = SelectPortraitDialogFragment
+					.newInstance(1);
+			selectPortraitDialogFragment
+					.setConfirmInterface(new SelectPortraitDialogFragment.ConfirmInterface() {
+
+						@Override
+						public void onConfirmInterface(String portrait) {
+							if (portrait == null) {
+								portrait = "4";
+							}
+							switch (portrait) {
+							case "1":
+								portraitImage.setImageResource(R.drawable.tx1);
+								portrait_database = "tx1";
+								break;
+							case "2":
+								portraitImage.setImageResource(R.drawable.tx2);
+								portrait_database = "tx2";
+								break;
+							case "3":
+								portraitImage.setImageResource(R.drawable.tx3);
+								portrait_database = "tx3";
+								break;
+							case "4":
+								portraitImage.setImageResource(R.drawable.tx4);
+								portrait_database = "tx4";
+								break;
+							case "5":
+								portraitImage.setImageResource(R.drawable.tx5);
+								portrait_database = "tx5";
+								break;
+							case "6":
+								portraitImage.setImageResource(R.drawable.tx6);
+								portrait_database = "tx6";
+								break;
+							case "7":
+								portraitImage.setImageResource(R.drawable.tx7);
+								portrait_database = "tx7";
+								break;
+							case "8":
+								portraitImage.setImageResource(R.drawable.tx8);
+								portrait_database = "tx8";
+								break;
+							default:
+								portraitImage.setImageResource(R.drawable.tx1);
+								portrait_database = "tx1";
+								break;
+							}
+							list.get(0).setPortrait(portrait_database);
+						}
+					});
+			selectPortraitDialogFragment.show(getActivity()
+					.getFragmentManager(), "selectPortraitDialogFragment");
+
+		}
+
+	}
+
+	// 点击昵称监视器 尼见 2015-03-03
+	class MyClickHoneyNameListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			ChangeHoneyNameDialogFragment changeHoneyNameDialogFragment = ChangeHoneyNameDialogFragment
+					.newInstance(1);
+			changeHoneyNameDialogFragment
+					.setConfirmInterface(new ChangeHoneyNameDialogFragment.ConfirmInterface() {
+
+						@Override
+						public void onConfirmInterface(String honeyName) {
+							honeyName_database = honeyName;
+							list.get(0).setHoneyName(honeyName_database);
+							text_under_portrait.setText(honeyName);
+							honey_name_text_view.setText(honeyName);
+						}
+					});
+			changeHoneyNameDialogFragment.show(getActivity()
+					.getFragmentManager(), "selectPortraitDialogFragment");
+
+		}
+	}
+
+	// 点击返回监视器 尼见 2015-03-03
+	class MyClickBackListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 在这里去判断是否修改了个人信息没有保存直接返回 尼见 2015-04-17
+			if (!personalInformation.getPortrait().equals(portrait_database)) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getHoneyName().equals(
+					honey_name_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getSex().equals(
+					sex_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getCellphone().equals(
+					cellphone_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getBirthday().equals(
+					birthday_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getGetupTime().equals(
+					list.get(0).getGetupTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getBreakfastTime().equals(
+					list.get(0).getBreakfastTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getLunchTime().equals(
+					list.get(0).getLunchTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getDinnerTime().equals(
+					list.get(0).getDinnerTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getSleepTime().equals(
+					list.get(0).getSleepTime())) {
+				isNeedToSave = true;
+			}
+			if (isNeedToSave == true) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithNeedToSave();
+						dialog.show();
+					}
+				});
+
+				return;
+			}
+			int isLogin = 0;
+
+			FragmentManager fragmentManager = getActivity()
+					.getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			familyMemberManageFragment = new FamilyMemberManageFragment();
+			fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+					R.anim.exit_to_right);
+			fragmentTransaction.replace(R.id.login_fragment,
+					familyMemberManageFragment, "familyMemberManageFragment");
+			fragmentTransaction.addToBackStack(null);
+			fragmentTransaction.commit();
+		}
+	}
+
+	// 点击性别监视器 尼见 2015-03-04
+	class MyClickSexListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			ChangeSexDialogFragment changeSexDialogFragment = ChangeSexDialogFragment
+					.newInstance("男");
+			changeSexDialogFragment
+					.setConfirmInterface(new ChangeSexDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(String sex) {
+							switch (sex) {
+							case "man":
+								sex_text_view.setText("男");
+								sex_database = "男";
+								break;
+							case "woman":
+								sex_text_view.setText("女");
+								sex_database = "女";
+								break;
+							}
+							list.get(0).setSex(sex_database);
+						}
+					});
+			Bundle bundle = new Bundle();
+			bundle.putString("sex", sex_database);
+			changeSexDialogFragment.setArguments(bundle);
+			changeSexDialogFragment.show(getActivity().getFragmentManager(),
+					"changeSexDialogFragment");
+
+		}
+	}
+
+	// 点击手机号监视器 尼见 2015-03-04
+	class MyClickCellphoneNumListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputCellphoneNumDialogFragment inputCellphoneNumDialogFragment = InputCellphoneNumDialogFragment
+					.newInstance(1);
+			inputCellphoneNumDialogFragment
+					.setConfirmInterface(new InputCellphoneNumDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(String cellphoneNum) {
+							cellphoneNum_database = cellphoneNum;
+							cellphone_text_view.setText(cellphoneNum);
+							list.get(0).setCellphone(cellphoneNum_database);
+						}
+					});
+			inputCellphoneNumDialogFragment.show(getActivity()
+					.getFragmentManager(), "changeSexDialogFragment");
+
+		}
+	}
+
+	// 点击生日监视器 尼见 2015-03-04
+	class MyClickBirthdayListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputBirthdayDialogFragment inputBirthdayDialogFragment = InputBirthdayDialogFragment
+					.newInstance(year_database, month_database, day_database);
+			inputBirthdayDialogFragment
+					.setConfirmInterface(new InputBirthdayDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int year, int month,
+								int day) {
+							String month_show;
+							String day_show;
+							if (month <= 9) {
+								month_show = "0" + month;
+							} else {
+								month_show = Integer.toString(month);
+							}
+							if (day <= 9) {
+								day_show = "0" + day;
+							} else {
+								day_show = Integer.toString(day);
+							}
+							birthday_text_view.setText(year + "-" + month_show
+									+ "-" + day_show);
+							birthday_database = year + "-" + month_show + "-"
+									+ day_show;
+							list.get(0).setBirthday(birthday_database);
+						}
+					});
+			if (birthday_database.equals("")) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("year", 1991);
+				bundle.putInt("month", 01);
+				bundle.putInt("day", 01);
+				inputBirthdayDialogFragment.setArguments(bundle);
+				inputBirthdayDialogFragment.show(getActivity()
+						.getFragmentManager(), "inputBirthdayDialogFragment");
+			} else {
+				String date[] = birthday_database.split("-");
+				int year = Integer.parseInt(date[0]);
+				int month = Integer.parseInt(date[1]);
+				int day = Integer.parseInt(date[2]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("year", year);
+				bundle.putInt("month", month);
+				bundle.putInt("day", day);
+				inputBirthdayDialogFragment.setArguments(bundle);
+				inputBirthdayDialogFragment.show(getActivity()
+						.getFragmentManager(), "inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+	// 点击作息时间监视器 尼见 2015-03-04
+	class MyClickRelaxTimeListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			FragmentManager fragmentManager = getActivity()
+					.getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			RelaxTimeFragment relaxTimeFragment = new RelaxTimeFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString("itemName", honeyName_database);
+			bundle.putInt("isMyself", 2);
+			bundle.putCharSequenceArrayList("PersonalInformation",
+					(ArrayList) list);
+			relaxTimeFragment.setArguments(bundle);
+			fragmentTransaction.setCustomAnimations(R.anim.enter_from_right,
+					R.anim.exit_to_left);
+			fragmentTransaction.replace(R.id.login_fragment, relaxTimeFragment,
+					"relaxTimeFragment");
+			fragmentTransaction.addToBackStack(null);
+			fragmentTransaction.commit();
+		}
+	}
+
+	// 点击保存个人信息监视器 尼见 2015-03-04
+	class MyClickSaveListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 昵称为空
+			if (honeyName_database.length() == 0) {
+
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithHoneyNameIsNULL();
+						dialog.show();
+					}
+				});
+
+				return;
+			}
+
+			db = databaseHelper.getWritableDatabase();
+			String sql2 = "select name from MemberInfoTable";
+			Cursor cursor = db.rawQuery(sql2, null);
+			while (cursor.moveToNext()) {
+				String name = cursor.getString(0);
+				if (honeyName_database.equals(selfHoneyName))
+					continue;
+				if (honeyName_database.equals(name)) {
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							AlertDialog dialog = getAlertDialogWithHoneyNameIsExist();
+							dialog.show();
+						}
+					});
+					return;
+				}
+			}
+
+			db = databaseHelper.getWritableDatabase();
+			String sql = "";
+			if (JudgeNetworkState.isConnected(getActivity())) {
+				progressDialog = ProgressDialog.show(getActivity(), null,
+						"数据加载中，请稍后...");
+				new AddMember().execute();
+			} else {
+				if (list.size() == 0) {
+					sql = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+							+ "" + "','"
+							+ honeyName_database
+							+ "','"
+							+ "0"
+							+ "','"
+							+ portrait_database
+							+ "','"
+							+ cellphoneNum_database
+							+ "','"
+							+ sex_database
+							+ "','"
+							+ birthday_database
+							+ "','"
+							+ ""
+							+ "','"
+							+ ""
+							+ "','"
+							+ ""
+							+ "','"
+							+ ""
+							+ "','" + "" + "','" + "" + "','" + "1" + "')";
+				} else {
+					sql = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+							+ "" + "','"
+							+ honeyName_database
+							+ "','"
+							+ "0"
+							+ "','"
+							+ portrait_database
+							+ "','"
+							+ cellphoneNum_database
+							+ "','"
+							+ sex_database
+							+ "','"
+							+ birthday_database
+							+ "','"
+							+ list.get(0).getGetupTime()
+							+ "','"
+							+ list.get(0).getBreakfastTime()
+							+ "','"
+							+ list.get(0).getLunchTime()
+							+ "','"
+							+ list.get(0).getDinnerTime()
+							+ "','"
+							+ list.get(0).getSleepTime()
+							+ "','"
+							+ ""
+							+ "','"
+							+ "1" + "')";
+				}
+				db.execSQL(sql);
+				db.close();
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithAddSuccess();
+						dialog.show();
+					}
+				});
+			}
+		}
+	}
+
+	// 保存成功提示框 尼见 2015-03-04
+	AlertDialog getAlertDialogWithSaveSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("添加成员成功!");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				FragmentManager fragmentManager = getActivity()
+						.getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager
+						.beginTransaction();
+				familyMemberManageFragment = new FamilyMemberManageFragment();
+				fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+						R.anim.exit_to_right);
+				fragmentTransaction.replace(R.id.login_fragment,
+						familyMemberManageFragment,
+						"familyMemberManageFragment");
+				fragmentTransaction.commit();
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 添加成员信息成功 尼见 2015-03-04
+	AlertDialog getAlertDialogWithAddSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("添加成员成功!");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				FragmentManager fragmentManager = getActivity()
+						.getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager
+						.beginTransaction();
+				familyMemberManageFragment = new FamilyMemberManageFragment();
+				fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+						R.anim.exit_to_right);
+				fragmentTransaction.replace(R.id.login_fragment,
+						familyMemberManageFragment,
+						"familyMemberManageFragment");
+				fragmentTransaction.commit();
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 昵称为空提示框提示框 尼见 2015-03-05
+	AlertDialog getAlertDialogWithHoneyNameIsNULL() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("昵称不能为空!");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 昵称已存在提示框提示框 尼见 2015-03-05
+	AlertDialog getAlertDialogWithHoneyNameIsExist() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("昵称已存在");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 提示用户是否保存修改的信息 尼见 2015-04-17
+	AlertDialog getAlertDialogWithNeedToSave() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("成员信息已经修改，是否保存");
+		builder.setPositiveButton("保存", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// 昵称为空
+				if (honeyName_database.length() == 0) {
+
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							AlertDialog dialog = getAlertDialogWithHoneyNameIsNULL();
+							dialog.show();
+						}
+					});
+
+					return;
+				}
+				// 如果isMyself标志位是1，表示为更新个人信息，调用update语句更新数据库
+				if (isMySelf == 1) {
+					if (JudgeNetworkState.isConnected(getActivity())) {
+						progressDialog = ProgressDialog.show(getActivity(),
+								null, "数据加载中，请稍后...");
+						new ModifyMyselfInfo().execute();
+					} else {
+						db = databaseHelper.getWritableDatabase();
+						String sql = "update MemberInfoTable set photo ='"
+								+ portrait_database + "' , name ='"
+								+ honeyName_database + "' , sex ='"
+								+ sex_database + "' , tel ='"
+								+ cellphoneNum_database + "' , birth ='"
+								+ birthday_database + "', getup ='"
+								+ list.get(0).getGetupTime()
+								+ "' , breakfast ='"
+								+ list.get(0).getBreakfastTime()
+								+ "' , lunch ='" + list.get(0).getLunchTime()
+								+ "' , dinner ='" + list.get(0).getDinnerTime()
+								+ "' , sleep ='" + list.get(0).getSleepTime()
+								+ "' where isFamily ='" + "1" + "'";
+						db.execSQL(sql);
+						db.close();
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithSaveSuccess();
+								dialog.show();
+							}
+						});
+					}
+					// 如果isMyself标志位不是1，表示为添加成员信息，调用add语句对数据库进行添加。
+				} else {
+					db = databaseHelper.getWritableDatabase();
+					String familyMemberUserID = java.util.UUID.randomUUID()
+							.toString();
+					String sql = "";
+					if (JudgeNetworkState.isConnected(getActivity())) {
+						progressDialog = ProgressDialog.show(getActivity(),
+								null, "数据加载中，请稍后...");
+						new AddMember().execute();
+					} else {
+						if (list.size() == 0) {
+							sql = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+									+ "" + "','"
+									+ honeyName_database
+									+ "','"
+									+ "0"
+									+ "','"
+									+ portrait_database
+									+ "','"
+									+ cellphoneNum_database
+									+ "','"
+									+ sex_database
+									+ "','"
+									+ birthday_database
+									+ "','"
+									+ ""
+									+ "','"
+									+ ""
+									+ "','"
+									+ ""
+									+ "','"
+									+ ""
+									+ "','"
+									+ ""
+									+ "','"
+									+ ""
+									+ "','" + "1" + "')";
+						} else {
+							sql = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+									+ "" + "','"
+									+ honeyName_database
+									+ "','"
+									+ "0"
+									+ "','"
+									+ portrait_database
+									+ "','"
+									+ cellphoneNum_database
+									+ "','"
+									+ sex_database
+									+ "','"
+									+ birthday_database
+									+ "','"
+									+ list.get(0).getGetupTime()
+									+ "','"
+									+ list.get(0).getBreakfastTime()
+									+ "','"
+									+ list.get(0).getLunchTime()
+									+ "','"
+									+ list.get(0).getDinnerTime()
+									+ "','"
+									+ list.get(0).getSleepTime()
+									+ "','" + "" + "','" + "1" + "')";
+						}
+						db.execSQL(sql);
+						db.close();
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithAddSuccess();
+								dialog.show();
+							}
+						});
+					}
+				}
+			}
+		});
+		builder.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				int isLogin = 0;
+				if (isMySelf == 1) {
+					try {
+						db = databaseHelper.getWritableDatabase();
+						String sql = "select * from anonymityRegister";
+						Cursor cursor = db.rawQuery(sql, null);
+						while (cursor.moveToNext()) {
+							isLogin = cursor.getInt(7);
+						}
+						// 如果标志flag为0则让其匿名注册，如果flag为1则拒绝匿名注册。
+						if (isLogin == 1) {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							myAccountFragment = new MyAccountFragment();
+							Bundle bundle = new Bundle();
+							bundle.putInt("flag", 1);
+							myAccountFragment.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									myAccountFragment, "myAccountFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						} else {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							myAccountFragment = new MyAccountFragment();
+							Bundle bundle = new Bundle();
+							bundle.putInt("flag", 0);
+							myAccountFragment.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									myAccountFragment, "myAccountFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						}
+						db.close();
+					} catch (Exception e) {
+					}
+				} else {
+					FragmentManager fragmentManager = getActivity()
+							.getSupportFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager
+							.beginTransaction();
+					familyMemberManageFragment = new FamilyMemberManageFragment();
+					fragmentTransaction.setCustomAnimations(
+							R.anim.enter_from_left, R.anim.exit_to_right);
+					fragmentTransaction.replace(R.id.login_fragment,
+							familyMemberManageFragment,
+							"familyMemberManageFragment");
+					fragmentTransaction.addToBackStack(null);
+					fragmentTransaction.commit();
+				}
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 在工作线程中调用维护成员信息接口 尼见 2015-04-21
+	class ModifyMyselfInfo extends AsyncTask<Object, Object, Object> {
+
+		@Override
+		protected Objects doInBackground(Object... params) {
+
+			// 调用维护成员信息接口 尼见 2015-04-21
+			// 声明网址字符串
+			App app = (App) getActivity().getApplication();
+			String uriAPI2 = app.getInterfaceUrl()
+					+ "guarder/api/user/SaveMember";
+			HttpPost httpRequest2 = new HttpPost(uriAPI2);
+			List<NameValuePair> params2 = new ArrayList<NameValuePair>();
+			// 获取当前时间
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			Date curDate = new Date(System.currentTimeMillis());
+			String localTimeStamp = formatter.format(curDate);
+			db = databaseHelper.getWritableDatabase();
+			String sql = "select * from anonymityRegister";
+			Cursor cursor = db.rawQuery(sql, null);
+			String userID = null;
+			while (cursor.moveToNext()) {
+				userID = cursor.getString(3);
+			}
+			params2.add(new BasicNameValuePair("userID", userID));
+			params2.add(new BasicNameValuePair("memberID", userID));
+			params2.add(new BasicNameValuePair("nick", honeyName_database));
+			params2.add(new BasicNameValuePair("sex", "1"));
+			params2.add(new BasicNameValuePair("birth", birthday_database));
+			params2.add(new BasicNameValuePair("tel", cellphoneNum_database));
+			params2.add(new BasicNameValuePair("photo", portrait_database));
+			params2.add(new BasicNameValuePair("isDel", "0"));
+			try {
+				// 发出http request
+				httpRequest2.setEntity(new UrlEncodedFormEntity(params2,
+						HTTP.UTF_8));
+				// 取得http response
+				HttpResponse httpResponse2 = new DefaultHttpClient()
+						.execute(httpRequest2);
+				// 若状态码为200 ok
+				if (httpResponse2.getStatusLine().getStatusCode() == 200) {
+					String strResult2 = EntityUtils.toString(httpResponse2
+							.getEntity());
+					JSONObject jsonObject2 = new JSONObject(strResult2);
+					// 成功接受到服务器返回数据之后，结束进度等待窗口
+					if (list.get(0).getBreakfastTime().length() == 0) {
+						progressDialog.dismiss();
+					}
+					db = databaseHelper.getWritableDatabase();
+					String sql3 = "update MemberInfoTable set photo ='"
+							+ portrait_database + "' , name ='"
+							+ honeyName_database + "' , sex ='" + sex_database
+							+ "' , tel ='" + cellphoneNum_database
+							+ "' , birth ='" + birthday_database
+							+ "', getup ='" + list.get(0).getGetupTime()
+							+ "' , breakfast ='"
+							+ list.get(0).getBreakfastTime() + "' , lunch ='"
+							+ list.get(0).getLunchTime() + "' , dinner ='"
+							+ list.get(0).getDinnerTime() + "' , sleep ='"
+							+ list.get(0).getSleepTime()
+							+ "' where isFamily ='" + "1" + "'";
+					db.execSQL(sql3);
+					db.close();
+					if (list.get(0).getBreakfastTime().length() == 0) {
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithSaveSuccess();
+								dialog.show();
+							}
+						});
+					}
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+			db.close();
+
+			// 如果作息时间不为空，则调用接口去保存作息时间到服务器
+			if (list.get(0).getBreakfastTime().length() != 0) {
+				// 调用生成用药时间点接口 尼见 2015-03-27
+				// 声明网址字符串
+
+				String uriAPI3 = app.getInterfaceUrl()
+						+ "guarder/api/user/SaveRest";
+				HttpPost httpRequest3 = new HttpPost(uriAPI3);
+				List<NameValuePair> params3 = new ArrayList<NameValuePair>();
+				db = databaseHelper.getWritableDatabase();
+				params3.add(new BasicNameValuePair("restTime", "[{"
+						+ "\"getup\":\"" + list.get(0).getGetupTime()
+						+ "\",\"breakfast\":\""
+						+ list.get(0).getBreakfastTime() + "\",\"lunch\":\""
+						+ list.get(0).getLunchTime() + "\",\"supper\":\""
+						+ list.get(0).getDinnerTime() + "\",\"sleep\":\""
+						+ list.get(0).getSleepTime() + "\",\"sysuserID\":\""
+						+ userID + "\"" + "}]"));
+				try {
+					// 发出http request
+					httpRequest3.setEntity(new UrlEncodedFormEntity(params3,
+							HTTP.UTF_8));
+					// 取得http response
+					HttpResponse httpResponse3 = new DefaultHttpClient()
+							.execute(httpRequest3);
+					// 若状态码为200 ok
+					if (httpResponse3.getStatusLine().getStatusCode() == 200) {
+						String strResult3 = EntityUtils.toString(httpResponse3
+								.getEntity());
+						JSONObject jsonObject3 = new JSONObject(strResult3);
+						// 成功接受到服务器数据，结束等待框
+						progressDialog.dismiss();
+						db = databaseHelper.getWritableDatabase();
+						String sql2 = "update MemberInfoTable set getup ='"
+								+ list.get(0).getGetupTime()
+								+ "' , breakfast ='"
+								+ list.get(0).getBreakfastTime()
+								+ "' , lunch ='" + list.get(0).getLunchTime()
+								+ "' , dinner ='" + list.get(0).getDinnerTime()
+								+ "' , sleep ='" + list.get(0).getSleepTime()
+								+ "' where isFamily ='" + "1" + "'";
+						db.execSQL(sql2);
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithSaveSuccess();
+								dialog.show();
+							}
+						});
+						db.close();
+					}
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			}
+
+			return null;
+		}
+
+	}
+
+	// 在工作线程中调用维护成员信息接口 尼见 2015-04-21
+	class AddMember extends AsyncTask<Object, Object, Object> {
+
+		@Override
+		protected Objects doInBackground(Object... params) {
+
+			// 调用维护成员信息接口 尼见 2015-04-21
+			// 声明网址字符串
+			App app = (App) getActivity().getApplication();
+			String uriAPI2 = app.getInterfaceUrl()
+					+ "guarder/api/user/SaveMember";
+			HttpPost httpRequest2 = new HttpPost(uriAPI2);
+			List<NameValuePair> params2 = new ArrayList<NameValuePair>();
+			// 从服务器获得的memberID
+			String member_id_from_server = "";
+			db = databaseHelper.getWritableDatabase();
+			String sql = "select * from anonymityRegister";
+			Cursor cursor = db.rawQuery(sql, null);
+			String userID = null;
+			while (cursor.moveToNext()) {
+				userID = cursor.getString(3);
+			}
+			params2.add(new BasicNameValuePair("userID", userID));
+			params2.add(new BasicNameValuePair("memberID", ""));
+			params2.add(new BasicNameValuePair("nick", honeyName_database));
+			params2.add(new BasicNameValuePair("sex", "1"));
+			params2.add(new BasicNameValuePair("birth", birthday_database));
+			params2.add(new BasicNameValuePair("tel", cellphoneNum_database));
+			params2.add(new BasicNameValuePair("photo", portrait_database));
+			params2.add(new BasicNameValuePair("isDel", "0"));
+			try {
+				// 发出http request
+				httpRequest2.setEntity(new UrlEncodedFormEntity(params2,
+						HTTP.UTF_8));
+				// 取得http response
+				HttpResponse httpResponse2 = new DefaultHttpClient()
+						.execute(httpRequest2);
+				// 若状态码为200 ok
+				if (httpResponse2.getStatusLine().getStatusCode() == 200) {
+					String strResult2 = EntityUtils.toString(httpResponse2
+							.getEntity());
+					JSONObject jsonObject2 = new JSONObject(strResult2);
+					// 成功接受到服务器返回数据之后，结束进度等待窗口
+					progressDialog.dismiss();
+					JSONObject jsonObject = jsonObject2.getJSONObject("data");
+					String sysUser_ID = jsonObject.getString("sysUser_ID");
+					member_id_from_server = sysUser_ID;
+					db = databaseHelper.getWritableDatabase();
+					String familyMemberUserID = java.util.UUID.randomUUID()
+							.toString();
+					String sql2 = "";
+					if (list.size() == 0) {
+						sql2 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+								+ member_id_from_server
+								+ "','"
+								+ honeyName_database
+								+ "','"
+								+ "0"
+								+ "','"
+								+ portrait_database
+								+ "','"
+								+ cellphoneNum_database
+								+ "','"
+								+ sex_database
+								+ "','"
+								+ birthday_database
+								+ "','"
+								+ ""
+								+ "','"
+								+ ""
+								+ "','"
+								+ ""
+								+ "','"
+								+ ""
+								+ "','"
+								+ "" + "','" + "" + "','" + "1" + "')";
+					} else {
+						sql2 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('"
+								+ member_id_from_server
+								+ "','"
+								+ honeyName_database
+								+ "','"
+								+ "0"
+								+ "','"
+								+ portrait_database
+								+ "','"
+								+ cellphoneNum_database
+								+ "','"
+								+ sex_database
+								+ "','"
+								+ birthday_database
+								+ "','"
+								+ list.get(0).getGetupTime()
+								+ "','"
+								+ list.get(0).getBreakfastTime()
+								+ "','"
+								+ list.get(0).getLunchTime()
+								+ "','"
+								+ list.get(0).getDinnerTime()
+								+ "','"
+								+ list.get(0).getSleepTime()
+								+ "','"
+								+ ""
+								+ "','" + "1" + "')";
+					}
+					db.execSQL(sql2);
+					if (list.get(0).getGetupTime().length() == 0) {
+						// 提示用户添加成员成功
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+
+								AlertDialog dialog = getAlertDialogWithAddSuccess();
+								dialog.show();
+
+							}
+						});
+					}
+					db.close();
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+			db.close();
+
+			// 查询person实体，如果有时间则调用服务器时间接口，保存该成员作息时间
+			if (list.get(0).getBreakfastTime().length() != 0) {
+				// 调用生成用药时间点接口 尼见 2015-03-27
+				// 声明网址字符串
+				String uriAPI3 = app.getInterfaceUrl()
+						+ "guarder/api/user/SaveRest";
+				HttpPost httpRequest3 = new HttpPost(uriAPI3);
+				List<NameValuePair> params3 = new ArrayList<NameValuePair>();
+				db = databaseHelper.getWritableDatabase();
+				params3.add(new BasicNameValuePair("restTime", "[{"
+						+ "\"getup\":\"" + list.get(0).getGetupTime()
+						+ "\",\"breakfast\":\""
+						+ list.get(0).getBreakfastTime() + "\",\"lunch\":\""
+						+ list.get(0).getLunchTime() + "\",\"supper\":\""
+						+ list.get(0).getDinnerTime() + "\",\"sleep\":\""
+						+ list.get(0).getSleepTime() + "\",\"sysuserID\":\""
+						+ member_id_from_server + "\"" + "}]"));
+				try {
+					// 发出http request
+					httpRequest3.setEntity(new UrlEncodedFormEntity(params3,
+							HTTP.UTF_8));
+					// 取得http response
+					HttpResponse httpResponse3 = new DefaultHttpClient()
+							.execute(httpRequest3);
+					// 若状态码为200 ok
+					if (httpResponse3.getStatusLine().getStatusCode() == 200) {
+						String strResult3 = EntityUtils.toString(httpResponse3
+								.getEntity());
+						JSONObject jsonObject3 = new JSONObject(strResult3);
+						// 成功接受到服务器数据，结束等待框
+						progressDialog.dismiss();
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithSaveSuccess();
+								dialog.show();
+							}
+						});
+					}
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			}
+
+			return null;
+		}
+
+	}
+
+}

@@ -1,0 +1,202 @@
+package com.phhc.drugQuery;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.phhc.R;
+import com.phhc.utils.CreateSQLiteDatabase;
+import com.phhc.utils.DrugItem;
+import com.phhc.utils.DrugItemAdapter;
+import com.phhc.utils.SideBar;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+public class DrugQueryFragment extends Fragment {
+
+    DrugDetailQueryFragment drugDetailQueryFragment;
+    ImageView search;
+    SideBar alpha;
+    TextView dialog_center,scan;
+    DrugDetailFragment drugDetailFragment;
+    ArrayList<DrugItem> list;
+    DrugItemAdapter drugItemAdapter;
+    ListView listView;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase db;
+    String databaseName, drugName, productDrugId, basicDrugId;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        databaseName = "drug_info";
+        databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName, null, 1);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.drug_query_fragment, container, false);
+
+        //二维码按钮
+        scan = (TextView) rootView.findViewById(R.id.scan);
+        scan.setOnClickListener(new MyClickOpenBarcodeScannerListener());
+        //字母导航条按钮
+        alpha = (SideBar) rootView.findViewById(R.id.alpha);
+        alpha.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
+            @Override
+            public void onTouchingLetterChanged(String s) {
+                //该字母首次出现的位置
+                int position = drugItemAdapter.getPositionForSection(s.charAt(0));
+                if (position != -1) {
+                    listView.setSelection(position);
+                }
+            }
+        });
+        search = (ImageView) rootView.findViewById(R.id.search);
+        search.setOnClickListener(new MyClickSearchListener());
+        listView = (ListView) rootView.findViewById(R.id.list);
+        //设置点击监视器
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+                DrugItem drugItem = (DrugItem) listView.getItemAtPosition(position);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                drugDetailFragment = new DrugDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("productDrugId", drugItem.getProductDrugId());
+                bundle.putString("basicDrugId", drugItem.getBasicDrugId());
+                drugDetailFragment.setArguments(bundle);
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+                fragmentTransaction.replace(R.id.login_fragment, drugDetailFragment, "drugDetailFragment");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+
+        });
+        //将外部数据库导入到手机中
+        File file = new File("/data/data/com.phhc/databases/", "drug_info");
+        list = new ArrayList<DrugItem>();
+        if (!file.exists()) {
+            try {
+                InputStream in = getResources().openRawResource(R.raw.drug_info);
+                FileOutputStream out = new FileOutputStream(file);
+                int n;
+                byte a[] = new byte[1024];
+                while ((n = in.read(a)) != -1) {
+                    out.write(a, 0, n);
+                }
+                out.close();
+                in.close();
+            } catch (IOException exp) {
+            }
+        }
+        //从数据库中查询数据
+        db = databaseHelper.getWritableDatabase();
+        String sql = "select showName, firstWord, productDrugId,basicDrugId from drugSearchTable where type = '1' order by commonPinYin asc";
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            drugName = cursor.getString(0);
+            String letter = cursor.getString(1);
+            productDrugId = cursor.getString(2);
+            basicDrugId = cursor.getString(3);
+//          String pinyin = cursor.getString(8);
+//          localDrugID = cursor.getString(2);
+//          drugDescription = cursor.getString(5);
+            list.add(new DrugItem(productDrugId, drugName, basicDrugId, letter));
+        }
+        drugItemAdapter = new DrugItemAdapter();
+        drugItemAdapter.setContext(getActivity());
+        drugItemAdapter.setArrayList(list);
+        listView.setAdapter(drugItemAdapter);
+        db.close();
+        dialog_center = (TextView) rootView.findViewById(R.id.dialog_center);
+        alpha = (SideBar) rootView.findViewById(R.id.alpha);
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+    //点击搜索监视器 尼见 2015-03-10
+    class MyClickSearchListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            drugDetailQueryFragment = new DrugDetailQueryFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_down, R.anim.exit_to_up);
+            fragmentTransaction.replace(R.id.login_fragment, drugDetailQueryFragment, "drugDetailQueryFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //点击二维码监视器 尼见 2015-03-17
+    class MyClickOpenBarcodeScannerListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE");
+            startActivityForResult(intent, 0);
+
+        }
+
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0) {
+            if (resultCode == 1) {
+                String contents = intent.getStringExtra("SCAN_RESULT");
+                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                Log.i("xZing", "contents: " + contents + " format: " + format);
+                // Handle successful scan
+            } else if (resultCode == 0) {
+                // Handle cancel
+                Log.i("xZing", "Cancelled");
+            }
+        }
+    }
+
+}

@@ -1,0 +1,420 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+/**
+ * 忘记密码对应的页面
+ */
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.App;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.TimeButton;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class ForgetPasswordFragment extends Fragment {
+
+	CreateSQLiteDatabase databaseHelper;
+	String cellphoneNumber, password, authCodeFromServer, authCodeFromUser,
+			databaseName;
+	EditText input_cellphone, input_password, input_authCode;
+	TimeButton button_get_auth_code;
+	Button button_affirm;
+	MyAccountFragment myAccountFragment;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.forget_password_fragment,
+				container, false);
+		button_get_auth_code = (TimeButton) rootView
+				.findViewById(R.id.button_get_check_code);
+		button_get_auth_code
+				.setOnClickListener(new MyClickGetAuthCodeButtonListener());
+		button_get_auth_code.setTextAfter("秒后重新获取").setTextBefore("点击获取验证码")
+				.setLength(5 * 1000);
+		button_affirm = (Button) rootView.findViewById(R.id.button_affirm);
+		button_affirm.setOnClickListener(new MyClickAffirmButtonListener());
+		// 手机号
+		input_cellphone = (EditText) rootView
+				.findViewById(R.id.input_cellphone);
+		// 新密码
+		input_password = (EditText) rootView.findViewById(R.id.input_password);
+		// 验证码
+		input_authCode = (EditText) rootView.findViewById(R.id.input_auth_code);
+
+		return rootView;
+
+	}
+
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
+
+	// 获取验证码按钮监听器实现 尼见 2015-02-28
+	class MyClickGetAuthCodeButtonListener implements View.OnClickListener {
+		@Override
+		public void onClick(View view) {
+			new GetAuthCode().execute();
+		}
+
+	}
+
+	// 在工作线程中获取验证码 尼见 2015-02-28
+	class GetAuthCode extends AsyncTask<Objects, Objects, Objects> {
+
+		@Override
+		protected Objects doInBackground(Objects... params) {
+
+			// 在这里赋值才能接受
+			cellphoneNumber = input_cellphone.getText().toString();
+			// 对手机号进行判断，第一位是‘1’，其余10位是0-9任意数字
+			if (!cellphoneNumber.matches("1[0-9]{10}")) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+
+						AlertDialog dialog = getAlertDialogWithCellphoneWrong();
+						dialog.show();
+
+					}
+				});
+
+				return null;
+			}
+
+			// 声明网址字符串
+			App app = (App) getActivity().getApplication();
+			String uriAPI = app.getInterfaceUrl()
+					+ "guarder/api/user/GetCheckCode";
+			// 创建http post连接
+			// post运行变量必须用NameValuePair[]数组存储
+			HttpPost httpRequest = new HttpPost(uriAPI);
+			List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+			params1.add(new BasicNameValuePair("name", cellphoneNumber));
+			params1.add(new BasicNameValuePair("type", "2"));
+			try {
+				// 发出http request
+				httpRequest.setEntity(new UrlEncodedFormEntity(params1,
+						HTTP.UTF_8));
+				// 取得http response
+				HttpResponse httpResponse = new DefaultHttpClient()
+						.execute(httpRequest);
+				// 若状态码为200 ok
+				if (httpResponse.getStatusLine().getStatusCode() == 200) {
+					String strResult = EntityUtils.toString(httpResponse
+							.getEntity());
+					JSONObject jsonObject = new JSONObject(strResult);
+					JSONObject jsonObjectData = jsonObject
+							.getJSONObject("data");
+					authCodeFromServer = jsonObjectData.getString("code");
+					// 验证码弹出框
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+
+							AlertDialog dialog = getAlertDialogWithShowAuthCode();
+							dialog.show();
+
+						}
+					});
+
+				} else {
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		// 手机号不正确警告框 尼见 2015-02-28
+		AlertDialog getAlertDialogWithCellphoneWrong() {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					getActivity(),
+					android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+			builder.setTitle("提示");
+			builder.setMessage("您输入的手机号不正确");
+			builder.setPositiveButton("确定", null);
+			builder.setCancelable(false);
+			android.app.AlertDialog dialog = builder.create();
+			return dialog;
+
+		}
+	}
+
+	// 确认按钮监听器实现 尼见 2015-02-28
+	class MyClickAffirmButtonListener implements View.OnClickListener {
+		@Override
+		public void onClick(View view) {
+			new Affirm().execute();
+		}
+	}
+
+	// 在工作线程中点击确认实现修改密码 尼见 2015-02-28
+	class Affirm extends AsyncTask<Objects, Objects, Objects> {
+
+		@Override
+		protected Objects doInBackground(Objects... params) {
+
+			// 在这里赋值才能接受
+			cellphoneNumber = input_cellphone.getText().toString();
+			password = input_password.getText().toString();
+			authCodeFromUser = input_authCode.getText().toString();
+			// 声明网址字符串
+			App app = (App) getActivity().getApplication();
+			String uriAPI = app.getInterfaceUrl()
+					+ "guarder/api/user/SetNewPwd";
+			// 创建http post连接，post运行变量必须用NameValuePair[]数组存储
+			HttpPost httpRequest = new HttpPost(uriAPI);
+			List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+			params1.add(new BasicNameValuePair("tel", cellphoneNumber));
+			params1.add(new BasicNameValuePair("pwd", password));
+			params1.add(new BasicNameValuePair("code", authCodeFromUser));
+
+			// 对手机号进行判断，第一位是‘1’，其余10位是0-9任意数字 尼见 2015-02-28
+			if (!cellphoneNumber.matches("1[0-9]{10}")) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+
+						AlertDialog dialog = getAlertDialogWithCellphoneWrong();
+						dialog.show();
+
+					}
+				});
+
+				return null;
+			}
+
+			// 对验证码进行判断，为六位数字 尼见 2015-02-28
+			if (!authCodeFromUser.matches("[0-9]{6}")) {
+
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+
+						AlertDialog dialog = getAlertDialogWithAuthCodeWrong();
+						dialog.show();
+					}
+				});
+
+				return null;
+
+			}
+
+			// 对密码进行验证，长度不少于六位的任意字符 尼见 2015-02-28
+			if (!password.matches(".{6,}")) {
+
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+
+						AlertDialog dialog = getAlertDialogWithPasswordLessSix();
+						dialog.show();
+					}
+				});
+
+				return null;
+
+			}
+
+			try {
+				// 发出http request
+				httpRequest.setEntity(new UrlEncodedFormEntity(params1,
+						HTTP.UTF_8));
+				// 去的http response
+				HttpResponse httpResponse = new DefaultHttpClient()
+						.execute(httpRequest);
+				// 若状态码为200 ok
+				if (httpResponse.getStatusLine().getStatusCode() == 200) {
+					String strResult = EntityUtils.toString(httpResponse
+							.getEntity());
+					JSONObject jsonObject = new JSONObject(strResult);
+					System.out.println(strResult);
+					String result = jsonObject.getString("result");
+					String error = jsonObject.getString("error");
+					if (error.isEmpty()) {
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithModifyPasswordSuccess();
+								dialog.show();
+							}
+						});
+						return null;
+					} else {
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+
+								AlertDialog dialog = getAlertDialogWithModifyPasswordSuccessFalse();
+								dialog.show();
+							}
+						});
+
+						return null;
+
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+	}
+
+	// 手机号不正确警告框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithCellphoneWrong() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("您输入的手机号不正确");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 显示验证码弹出框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithShowAuthCode() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage(authCodeFromServer);
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 密码长度少于六位警告框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithPasswordLessSix() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("密码不能少于6位");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 验证码错误警告框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithAuthCodeWrong() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("请输入6位验证码");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 修改密码成功提示框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithModifyPasswordSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("修改密码成功");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				myAccountFragment = new MyAccountFragment();
+				FragmentManager fragmentManager = getActivity()
+						.getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager
+						.beginTransaction();
+				Bundle bundle = new Bundle();
+				bundle.putInt("flag", 0);
+				myAccountFragment.setArguments(bundle);
+				fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+						R.anim.exit_to_right);
+				fragmentTransaction.replace(R.id.login_fragment,
+						myAccountFragment, "myAccountFragment");
+				fragmentTransaction.addToBackStack(null);
+				fragmentTransaction.commit();
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 修改密码不成功警告框 尼见 2015-02-28
+	AlertDialog getAlertDialogWithModifyPasswordSuccessFalse() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("该手机号尚未注册或者验证码错误或已经失效，如已经注册，请重新获取验证码！");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+}

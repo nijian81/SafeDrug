@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/myAccountFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bj"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/myAccount"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:gravity="center"
+        android:text="@string/myAccount"
+        android:textColor="@color/xmlTopTitleTextColor"
+        android:textSize="@dimen/xmlTopTitleTextSize" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/xmlWhiteLineHeight"
+        android:background="@color/xmlWhiteLineColor" />
+
+    <ScrollView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+            <!-- 完善个人信息 -->
+
+            <RelativeLayout
+                android:id="@+id/completePersonalInfo"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/wsgrxx_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/wsgrxx"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/completePersonalInformation"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleRightIconHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/xmlBlueLineHeight"
+                android:background="@null" />
+
+            <!-- 成员管理 -->
+
+            <RelativeLayout
+                android:id="@+id/memberManage"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:id="@+id/cygl_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/cygl"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/memberManage"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage_1"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line2"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/xmlBlueLineHeight"
+                android:layout_below="@+id/cygl"
+                android:background="@null" />
+
+            <!-- 修改密码 -->
+
+            <RelativeLayout
+                android:id="@+id/password_modify_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:visibility="gone"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:id="@+id/xgmm_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/xgmm"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/modifyPassword"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage_2"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line3"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/xmlBoldBlueLineHeight"
+                android:background="@null" />
+
+            <!-- 设置 -->
+
+            <RelativeLayout
+                android:id="@+id/setting"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:id="@+id/yjfk_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/sz"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/setup"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage_4"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line4"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/xmlBlueLineHeight"
+                android:layout_below="@+id/sz"
+                android:background="@null" />
+
+            <!-- 意见反馈 -->
+
+            <RelativeLayout
+                android:id="@+id/opinionFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:layout_below="@+id/blue_line4"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:id="@+id/sz_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/yjfk"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/opinionFeedback"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage_3"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line5"
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/yjfk"
+                android:background="@null" />
+            <!-- 关于我们 -->
+
+            <RelativeLayout
+                android:id="@+id/aboutUs"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:layout_below="@+id/blue_line5"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:id="@+id/gywm_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawableLeft="@drawable/gywm"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/aboutUs"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+                <ImageView
+                    android:id="@+id/changeToNextPage_5"
+                    android:layout_width="@dimen/xmlMiddleRightIconWidth"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/xiayiye" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line_upper_existingAccountLogin"
+                android:layout_width="fill_parent"
+                android:layout_height="10dip"
+                android:layout_below="@+id/gywm"
+                android:background="@null" />
+            <!-- 已有账户登录 -->
+
+            <RelativeLayout
+                android:id="@+id/existingAccountLogin"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:layout_below="@+id/blue_line6"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:text="@string/existingAccountLogin"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line_upper_register"
+                android:layout_width="fill_parent"
+                android:layout_height="10dip"
+                android:layout_below="@+id/yyzhdl"
+                android:background="@null" />
+            <!-- 注册 -->
+
+            <RelativeLayout
+                android:id="@+id/register"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:background="@null"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="@string/register"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/blue_line_upper_exit"
+                android:layout_width="fill_parent"
+                android:visibility="gone"
+                android:layout_height="10dip"
+                android:layout_below="@+id/yyzhdl"
+                android:background="@null" />
+            <!-- 退出 -->
+
+            <RelativeLayout
+                android:id="@+id/exit"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:visibility="gone"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:background="@null"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="@string/exit"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

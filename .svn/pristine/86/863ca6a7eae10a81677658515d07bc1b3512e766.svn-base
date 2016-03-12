@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <ImageButton
+            android:id="@+id/back_ring_list"
+            android:layout_height="@dimen/xmlTopLeftIconHeight"
+            android:layout_width="@dimen/xmlTopLeftIconWidth"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/xmlTopLeftIconMargin"
+            android:scaleType="centerInside"
+            android:onClick="login"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/fanhui" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:text="@string/ringList"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="@dimen/xmlTopTitleTextSize" />
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_marginRight="@dimen/xmlTextLayoutMarginRight"
+            android:text="@string/save"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="@dimen/xmlLittleTopTitleTextSize" />
+    </RelativeLayout>
+
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/cuckoo"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/cuckoo"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+        android:id="@+id/mark_cuckoo"
+        android:layout_width="@dimen/xmlMiddleRightIconWidth"
+        android:layout_height="@dimen/xmlMiddleRightIconHeight"
+        android:visibility="gone"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+        android:scaleType="centerInside"
+        android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/electric"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/electric"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_electric"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/happy"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/happy"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_happy"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/guitar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/guitar"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_guitar"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/churchRing"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/churchRing"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_churchRing"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" /><!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/birdVoice"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/birdVoice"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_birdVoice"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <RelativeLayout
+        android:id="@+id/dogVoice"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/dogVoice"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_dogVoice"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/mysteryNote"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/mysteryNote"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_mysteryNote"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <RelativeLayout
+        android:id="@+id/note"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/note"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/mark_note"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+
+
+
+
+
+</LinearLayout>

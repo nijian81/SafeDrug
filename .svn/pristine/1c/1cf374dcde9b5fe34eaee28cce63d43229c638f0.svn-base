@@ -1,0 +1,149 @@
+package cn.com.phhc.drugSafeApp.drugRemind;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.Constant.Constant;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ * 用药提醒首页中的点击添加药品，弹出的选择添加药品方式提示框
+ */
+public class SelectAddDrugMethodDialogFragment extends DialogFragment {
+
+	ConfirmInterface listener;
+	RelativeLayout scan, manualAdd;
+	String current_member_id;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName;
+
+	public static SelectAddDrugMethodDialogFragment newInstance(String sex) {
+		SelectAddDrugMethodDialogFragment frag = new SelectAddDrugMethodDialogFragment();
+		Bundle args = new Bundle();
+		args.putString("sex", sex);
+		frag.setArguments(args);
+		return frag;
+	}
+
+	public interface ConfirmInterface {
+		public void onConfirmInterface(String method);
+	}
+
+	public void setConfirmInterface(ConfirmInterface listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(
+				R.layout.select_add_drug_method_dialog, container, false);
+
+		db = databaseHelper.getWritableDatabase();
+		String sql2 = "select current_member_id, current_member_portrait,current_member_name from anonymityRegister";
+		Cursor cursor2 = db.rawQuery(sql2, null);
+		while (cursor2.moveToNext()) {
+			current_member_id = cursor2.getString(0);
+		}
+		// 扫一扫
+		scan = (RelativeLayout) rootView.findViewById(R.id.scan);
+		scan.setOnClickListener(new MyClickScanListener());
+		// 手工添加
+		manualAdd = (RelativeLayout) rootView.findViewById(R.id.manualAdd);
+		manualAdd.setOnClickListener(new MyClickManualAddListener());
+		Window window = getDialog().getWindow();
+		// set "origin" to top left corner, so to speak
+		window.setGravity(Gravity.TOP | Gravity.RIGHT);
+		// 设置背景色为透明
+		window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+		// after that, setting values for x and y works "naturally"
+		WindowManager.LayoutParams params = window.getAttributes();
+		params.x = 0;
+		params.y = Constant.height;
+		window.setAttributes(params);
+		getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	// 点击扫一扫监视器 尼见 2015-03-03
+	class MyClickScanListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+			intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE",
+					"QR_CODE_MODE");
+			startActivityForResult(intent, 0);
+		}
+	}
+
+	// 点击手动添加监视器 尼见 2015-03-03
+	class MyClickManualAddListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			AddDrugFragment addDrugFragment = new AddDrugFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString("drugName", "");
+			bundle.putString("current_member_id", current_member_id);
+			addDrugFragment.setArguments(bundle);
+			fragmentTransaction.setCustomAnimations(R.anim.enter_from_right,
+					R.anim.exit_to_left);
+			fragmentTransaction.replace(R.id.login_fragment, addDrugFragment,
+					"addDrugFragment");
+			fragmentTransaction.addToBackStack(null);
+			fragmentTransaction.commit();
+
+			dismiss();
+		}
+	}
+
+}

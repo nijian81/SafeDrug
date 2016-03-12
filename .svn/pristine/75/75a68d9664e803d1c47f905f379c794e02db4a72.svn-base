@@ -1,0 +1,196 @@
+package cn.com.phhc.drugSafeApp.drugQuery;
+
+/**
+ * 输入字母去查询药品页面。
+ */
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CharacterParser;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.DrugItem;
+import cn.com.phhc.drugSafeApp.utils.DrugItemAdapter;
+import cn.com.phhc.drugSafeApp.utils.PinyinComparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class DrugDetailQueryFragment extends Fragment {
+
+    DrugDetailFragment drugDetailFragment;
+    EditText input_search;
+    DrugQueryFragment drugQueryFragment;
+    TextView cancel;
+    ListView listView;
+    PinyinComparator pinyinComparator;
+    CharacterParser characterParser;
+    ArrayList<DrugItem> list;
+    DrugItemAdapter drugItemAdapter;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase db;
+    String databaseName, drugName, drugDescription, productDrugId, basicDrugId;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        databaseName = "drug_info";
+        databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName, null, 1);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.drug_detail_query_fragment, container, false);
+
+        input_search = (EditText) rootView.findViewById(R.id.input_search);
+        //实现搜索框改变监听器
+        input_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //当输入框里面的值为空，更新为原来的列表，否则为过滤数据列表
+                filterData(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        listView = (ListView) rootView.findViewById(R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> listView, View view, int position, long id) {
+                InputMethodManager imm = (InputMethodManager) getActivity()
+                        .getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                // 显示或者隐藏输入法
+                imm.hideSoftInputFromWindow(input_search.getWindowToken(), 0);
+                DrugItem drugItem = (DrugItem) listView.getItemAtPosition(position);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                drugDetailFragment = new DrugDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("productDrugId", drugItem.getProductDrugId());
+                bundle.putString("basicDrugId", drugItem.getBasicDrugId());
+                drugDetailFragment.setArguments(bundle);
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+                fragmentTransaction.replace(R.id.login_fragment, drugDetailFragment, "drugDetailFragment");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+
+        });
+        cancel = (TextView) rootView.findViewById(R.id.cancel);
+        cancel.setOnClickListener(new MyClickBackDrugQueryListener());
+        String sql = "select showName, firstWord, productDrugId, basicDrugId, commonPinyin from drugSearchTable where type = '1' order by commonPinYin asc";
+        db = databaseHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
+        characterParser = CharacterParser.getInstance();
+        pinyinComparator = new PinyinComparator();
+        list = new ArrayList<DrugItem>();
+        while (cursor.moveToNext()) {
+            drugName = cursor.getString(0);
+            String letter = cursor.getString(1);
+            productDrugId = cursor.getString(2);
+            basicDrugId = cursor.getString(3);
+            String pinyin = cursor.getString(4);
+            list.add(new DrugItem(productDrugId, drugName, basicDrugId, pinyin, letter));
+        }
+        drugItemAdapter = new DrugItemAdapter();
+        drugItemAdapter.setContext(getActivity());
+        drugItemAdapter.setArrayList(list);
+        Collections.sort(list, pinyinComparator);
+        listView.setAdapter(drugItemAdapter);
+        listView.setVisibility(View.INVISIBLE);
+
+        return rootView;
+
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+    //点击返回药品查询页面监视器 尼见 2015-03-10
+    class MyClickBackDrugQueryListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            InputMethodManager imm = (InputMethodManager) getActivity()
+                    .getSystemService(getActivity().INPUT_METHOD_SERVICE);
+            // 显示或者隐藏输入法
+            imm.hideSoftInputFromWindow(cancel.getWindowToken(), 0);
+            drugQueryFragment = new DrugQueryFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_up, R.anim.exit_to_down);
+            fragmentTransaction.replace(R.id.login_fragment, drugQueryFragment, "drugQueryFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //输入字符过滤药品监视器 尼见 2015-03-10
+    private void filterData(String filterStr) {
+        ArrayList<DrugItem> filterDateList = new ArrayList<DrugItem>();
+        String upper = filterStr.toUpperCase();
+        if (TextUtils.isEmpty(upper)) {
+            filterDateList = list;
+            drugItemAdapter.updateListView(filterDateList);
+            listView.setVisibility(View.GONE);
+        } else {
+            filterDateList.clear();
+            for (DrugItem drugItem : list) {
+                if (drugItem.getPinyin().contains(upper)) {
+                    filterDateList.add(drugItem);
+                }
+            }
+        }
+
+        // 根据a-z进行排序
+        Collections.sort(filterDateList, pinyinComparator);
+        drugItemAdapter.updateListView(filterDateList);
+        listView.setVisibility(View.VISIBLE);
+    }
+
+}

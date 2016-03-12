@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_height="@dimen/xmlTopLeftIconHeight"
+            android:layout_width="@dimen/xmlTopLeftIconWidth"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/xmlTopLeftIconMargin"
+            android:scaleType="centerInside"
+            android:onClick="login"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/fanhui" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:text="@string/takeDrugTime"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="@dimen/xmlTopTitleTextSize" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_width="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/set_time_1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_one_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_two_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_3"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_three_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_4"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_four_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_5"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_five_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_6"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_six_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_7"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_seven_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_8"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_eight_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_9"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_nine_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+            <RelativeLayout
+                android:id="@+id/set_time_10"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/xmlMiddleContentHeight"
+                android:background="@color/xmlMiddleContentBackgroundColor"
+                android:onClick="changePage">
+
+
+                <TextView
+                    android:id="@+id/time_ten_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/xmlMiddleContentHeight"
+                    android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+                    android:drawablePadding="@dimen/xmlTextDrawablePadding"
+                    android:gravity="center"
+                    android:text="@string/pleaseSetTakeDrugTime"
+                    android:textColor="@color/xmlMiddleContentTextColor"
+                    android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:layout_below="@+id/wsgrxx"
+                android:background="@null" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

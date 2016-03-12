@@ -1,0 +1,405 @@
+package cn.com.phhc.drugSafeApp.drugRemind;
+
+/**
+ * @author nijian  用药提醒圆盘页面
+ */
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.Constant.Constant;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+public class DrugRemindFragment extends Fragment {
+
+	ImageView addDrug, beforeDay, nextDay;
+	TextView date, currentPeople;
+	String localTimeStamp, current_member_id = null,
+			current_member_portrait = null, current_member_name = null;
+	static long timeShow;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName;
+	private RelativeLayout top;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.drug_remind_fragment,
+				container, false);
+
+		top = (RelativeLayout) rootView.findViewById(R.id.top);
+		// 查询当前服药人
+		db = databaseHelper.getWritableDatabase();
+		String sql = "select current_member_id, current_member_portrait,current_member_name from anonymityRegister";
+		Cursor cursor = db.rawQuery(sql, null);
+		while (cursor.moveToNext()) {
+			current_member_id = cursor.getString(0);
+			current_member_portrait = cursor.getString(1);
+			current_member_name = cursor.getString(2);
+		}
+		// 当前用药人
+		currentPeople = (TextView) rootView.findViewById(R.id.currentPeople);
+		currentPeople.setOnClickListener(new MyClickChangePeopleListener());
+		if (current_member_name.length() == 0) {
+			currentPeople.setText("自己");
+		} else {
+			currentPeople.setText(current_member_name);
+		}
+		Drawable drawable = null;
+		if (current_member_portrait.length() == 0) {
+			drawable = getResources().getDrawable(R.drawable.tx4);
+			drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+					drawable.getMinimumHeight());
+		} else {
+
+			switch (current_member_portrait) {
+			case "tx1":
+				drawable = getResources().getDrawable(R.drawable.tx1);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx2":
+				drawable = getResources().getDrawable(R.drawable.tx2);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx3":
+				drawable = getResources().getDrawable(R.drawable.tx3);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx4":
+				drawable = getResources().getDrawable(R.drawable.tx4);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx5":
+				drawable = getResources().getDrawable(R.drawable.tx5);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx6":
+				drawable = getResources().getDrawable(R.drawable.tx6);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx7":
+				drawable = getResources().getDrawable(R.drawable.tx7);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "tx8":
+				drawable = getResources().getDrawable(R.drawable.tx8);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz1":
+				drawable = getResources().getDrawable(R.drawable.tx1);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz2":
+				drawable = getResources().getDrawable(R.drawable.tx2);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz3":
+				drawable = getResources().getDrawable(R.drawable.tx3);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz4":
+				drawable = getResources().getDrawable(R.drawable.tx4);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz5":
+				drawable = getResources().getDrawable(R.drawable.tx5);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz6":
+				drawable = getResources().getDrawable(R.drawable.tx6);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz7":
+				drawable = getResources().getDrawable(R.drawable.tx7);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			case "xz8":
+				drawable = getResources().getDrawable(R.drawable.tx8);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			default:
+				drawable = getResources().getDrawable(R.drawable.tx4);
+				drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+						drawable.getMinimumHeight());
+				break;
+			}
+		}
+		Drawable drawable2 = getResources().getDrawable(
+				R.drawable.head_name_image);
+		drawable2.setBounds(0, 0, drawable2.getMinimumWidth(),
+				drawable2.getMinimumHeight());
+		currentPeople.setCompoundDrawables(null, drawable, drawable2, null);
+		// 选择用药添加方式
+		addDrug = (ImageView) rootView.findViewById(R.id.addDrug);
+		addDrug.setOnClickListener(new MyClickAddDrugListener());
+		// 当前日期
+		date = (TextView) rootView.findViewById(R.id.date);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		timeShow = System.currentTimeMillis();
+		Date curDate = new Date(System.currentTimeMillis());
+		localTimeStamp = formatter.format(curDate);
+		date.setText(localTimeStamp);
+		// 上一天
+		beforeDay = (ImageView) rootView.findViewById(R.id.beforeDay);
+		beforeDay.setOnClickListener(new MyClickBeforeDayListener());
+		// 下一天
+		nextDay = (ImageView) rootView.findViewById(R.id.nextDay);
+		nextDay.setOnClickListener(new MyClickNextDayListener());
+
+		return rootView;
+
+	}
+
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		Constant.height = getResources().getDimensionPixelSize(R.dimen.xmlTopTitleHeight);
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+
+	}
+
+	// 点击添加药品监视器 尼见 2015-03-18
+	class MyClickAddDrugListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			SelectAddDrugMethodDialogFragment selectAddDrugMethodDialogFragment = new SelectAddDrugMethodDialogFragment();
+			selectAddDrugMethodDialogFragment.show(getFragmentManager(),
+					"selectAddDrugMethodDialogFragment");
+		}
+	}
+
+	// 点击上一天监视器 尼见 2015-03-20
+	class MyClickBeforeDayListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			timeShow = timeShow - 86400000;
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Date curDate = new Date(timeShow);
+			localTimeStamp = formatter.format(curDate);
+			date.setText(localTimeStamp);
+		}
+	}
+
+	// 点击下一天监视器 尼见 2015-03-20
+	class MyClickNextDayListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			timeShow = timeShow + 86400000;
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Date curDate = new Date(timeShow);
+			localTimeStamp = formatter.format(curDate);
+			date.setText(localTimeStamp);
+		}
+	}
+
+	// 点击选择用药人监视器 尼见 2015-03-20
+	class MyClickChangePeopleListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			SelectTakeDrugPeopleDialogFragment selectTakeDrugPeopleDialogFragment = new SelectTakeDrugPeopleDialogFragment();
+			selectTakeDrugPeopleDialogFragment
+					.setConfirmInterface(new SelectTakeDrugPeopleDialogFragment.ConfirmInterface() {
+						@Override
+						public void onConfirmInterface(String portrait,
+								String name) {
+							currentPeople.setText(name);
+							Drawable drawable = null;
+							String portrait_flag = portrait;
+							switch (portrait_flag) {
+							case "tx1":
+								drawable = getResources().getDrawable(
+										R.drawable.tx1);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx2":
+								drawable = getResources().getDrawable(
+										R.drawable.tx2);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx3":
+								drawable = getResources().getDrawable(
+										R.drawable.tx3);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx4":
+								drawable = getResources().getDrawable(
+										R.drawable.tx4);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx5":
+								drawable = getResources().getDrawable(
+										R.drawable.tx5);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx6":
+								drawable = getResources().getDrawable(
+										R.drawable.tx6);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx7":
+								drawable = getResources().getDrawable(
+										R.drawable.tx7);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "tx8":
+								drawable = getResources().getDrawable(
+										R.drawable.tx8);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz1":
+								drawable = getResources().getDrawable(
+										R.drawable.tx1);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz2":
+								drawable = getResources().getDrawable(
+										R.drawable.tx2);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz3":
+								drawable = getResources().getDrawable(
+										R.drawable.tx3);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz4":
+								drawable = getResources().getDrawable(
+										R.drawable.tx4);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz5":
+								drawable = getResources().getDrawable(
+										R.drawable.tx5);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz6":
+								drawable = getResources().getDrawable(
+										R.drawable.tx6);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz7":
+								drawable = getResources().getDrawable(
+										R.drawable.tx7);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							case "xz8":
+								drawable = getResources().getDrawable(
+										R.drawable.tx8);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							default:
+								drawable = getResources().getDrawable(
+										R.drawable.tx4);
+								drawable.setBounds(0, 0,
+										drawable.getMinimumWidth(),
+										drawable.getMinimumHeight());
+								break;
+							}
+							Drawable drawable2 = getResources().getDrawable(
+									R.drawable.head_name_image);
+							drawable2.setBounds(0, 0,
+									drawable2.getMinimumWidth(),
+									drawable2.getMinimumHeight());
+							currentPeople.setCompoundDrawables(null, drawable,
+									drawable2, null);
+						}
+					});
+
+			Bundle bundle = new Bundle();
+			bundle.putString("name", currentPeople.getText().toString());
+			selectTakeDrugPeopleDialogFragment.setArguments(bundle);
+			selectTakeDrugPeopleDialogFragment.show(getFragmentManager(),
+					"selectTakeDrugPeopleDialogFragment");
+		}
+	}
+
+}

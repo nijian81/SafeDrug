@@ -1,0 +1,92 @@
+package cn.com.phhc.drugSafeApp.welcomePageActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.myAccount.AboutUsFragment;
+
+public class WelcomePageActivity extends Activity {
+
+	AboutUsFragment aboutUsFragment;
+	ImageView jumpIntoAboutUs;
+	LinearLayout linearLayoutTab;
+	private ViewPager vp;
+	private cn.com.phhc.drugSafeApp.utils.ViewPagerAdapter vpAdapter;
+	private List<View> views;
+	private ImageView[] dots;
+
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.welcome_page_fragment);
+		
+		LayoutInflater inflater = LayoutInflater.from(this);
+		views = new ArrayList<View>();
+		// 初始化引导图片列表
+		views.add(inflater.inflate(R.layout.welcome1, null));
+		views.add(inflater.inflate(R.layout.welcome2, null));
+		views.add(inflater.inflate(R.layout.welcome3, null));
+		views.add(inflater.inflate(R.layout.welcome4, null));
+		views.add(inflater.inflate(R.layout.welcome5, null));
+		jumpIntoAboutUs = (ImageView) views.get(4).findViewById(
+				R.id.jumpIntoAboutUs);
+		jumpIntoAboutUs
+				.setOnClickListener(new MyClickJumpIntoAboutUsListener());
+		// 初始化Adapter
+		vpAdapter = new cn.com.phhc.drugSafeApp.utils.ViewPagerAdapter(views,
+				this);
+		vp = (ViewPager) findViewById(R.id.welcomePageViewPaper);
+		vp.setAdapter(vpAdapter);
+		// 设置页面切换监视器
+		vp.setOnPageChangeListener(new SwitchPageChangeListener());
+		dots = new ImageView[views.size()];
+		dots[0] = (ImageView) findViewById(R.id.one);
+		dots[1] = (ImageView) findViewById(R.id.two);
+		dots[2] = (ImageView) findViewById(R.id.three);
+		dots[3] = (ImageView) findViewById(R.id.four);
+		dots[4] = (ImageView) findViewById(R.id.five);
+
+	}
+
+	// 指引页面更改事件监听器，设置圆点滑动时的背景变化。
+	class SwitchPageChangeListener implements ViewPager.OnPageChangeListener {
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+		}
+
+		@Override
+		public void onPageSelected(int arg0) {
+			for (int i = 0; i < dots.length; i++) {
+				dots[arg0].setImageResource(R.drawable.dot_green);
+				if (arg0 != i) {
+					dots[i].setImageResource(R.drawable.dot_gray);
+				}
+			}
+		}
+	}
+
+	// 欢迎页中点击开始安全用药之旅按钮的监听事件 尼见 2015-02-26
+	class MyClickJumpIntoAboutUsListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			finish();
+		}
+	}
+
+}

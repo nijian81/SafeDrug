@@ -1,0 +1,118 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+/**
+ * 作息时间fragment
+ */
+
+import android.app.DialogFragment;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
+import android.widget.TimePicker;
+
+import cn.com.phhc.drugSafeApp.R;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class InputRelaxTimeFragment extends DialogFragment {
+
+    ConfirmInterface listener;
+    TimePicker timePicker;
+    TextView cancel, confirm;
+    int hour, minute;
+
+    //定制fragmentDialog弹出动作
+    @Override
+    public void onActivityCreated(Bundle arg0) {
+        super.onActivityCreated(arg0);
+        getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+    }
+
+    public static InputRelaxTimeFragment newInstance(int hour, int minute) {
+        InputRelaxTimeFragment frag = new InputRelaxTimeFragment();
+        Bundle args = new Bundle();
+        args.putInt("hour", hour);
+        args.putInt("minute", minute);
+        frag.setArguments(args);
+        hour = frag.getArguments().getInt("hour");
+        minute = frag.getArguments().getInt("minute");
+        return frag;
+    }
+
+    public interface ConfirmInterface {
+        public void onConfirmInterface(int hour, int minute);
+    }
+
+    public void setConfirmInterface(ConfirmInterface listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.input_relax_time_dialog, container, false);
+
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.BOTTOM);
+        timePicker = (TimePicker) rootView.findViewById(R.id.timePicker);
+        hour = getArguments().getInt("hour", 0);
+        minute = getArguments().getInt("minute", 0);
+        timePicker.setCurrentHour(hour);
+        timePicker.setCurrentMinute(minute);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        cancel = (TextView) rootView.findViewById(R.id.cancel);
+        cancel.setOnClickListener(new MyClickCancelListener());
+        confirm = (TextView) rootView.findViewById(R.id.confirm);
+        confirm.setOnClickListener(new MyClickConfirmListener());
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    //点击取消监视器 尼见 2015-03-04
+    class MyClickCancelListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            dismiss();
+        }
+    }
+
+    //点击保存监视器 尼见 2015-03-04
+    class MyClickConfirmListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            int hour = timePicker.getCurrentHour();
+            int minute = timePicker.getCurrentMinute();
+            listener.onConfirmInterface(hour, minute);
+            dismiss();
+        }
+    }
+
+}

@@ -1,0 +1,153 @@
+package com.phhc.utils;
+
+/**
+ * Created by lenovo on 2015/4/14.
+ */
+public class MemberInfoTable {
+    String memberID;
+    String isFamily;
+    String name;
+    String tel;
+    String sex;
+    String birth;
+    String photo;
+    String getup;
+    String breakfast;
+    String lunch;
+    String dinner;
+    String sleep;
+    String updateTime;
+    String updateState;
+
+    public MemberInfoTable() {
+    }
+
+    public String getMemberID() {
+        return memberID;
+    }
+
+    public void setMemberID(String memberID) {
+        this.memberID = memberID;
+    }
+
+    public String getIsFamily() {
+        return isFamily;
+    }
+
+    public void setIsFamily(String isFamily) {
+        this.isFamily = isFamily;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getBirth() {
+        return birth;
+    }
+
+    public void setBirth(String birth) {
+        this.birth = birth;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getGetup() {
+        return getup;
+    }
+
+    public void setGetup(String getup) {
+        this.getup = getup;
+    }
+
+    public String getBreakfast() {
+        return breakfast;
+    }
+
+    public void setBreakfast(String breakfast) {
+        this.breakfast = breakfast;
+    }
+
+    public String getLunch() {
+        return lunch;
+    }
+
+    public void setLunch(String lunch) {
+        this.lunch = lunch;
+    }
+
+    public String getDinner() {
+        return dinner;
+    }
+
+    public void setDinner(String dinner) {
+        this.dinner = dinner;
+    }
+
+    public String getSleep() {
+        return sleep;
+    }
+
+    public void setSleep(String sleep) {
+        this.sleep = sleep;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getUpdateState() {
+        return updateState;
+    }
+
+    public void setUpdateState(String updateState) {
+        this.updateState = updateState;
+    }
+
+    public MemberInfoTable(String memberID, String isFamily, String name, String tel, String sex, String birth, String photo, String getup, String breakfast, String lunch, String dinner, String sleep, String updateTime, String updateState) {
+        this.memberID = memberID;
+        this.isFamily = isFamily;
+        this.name = name;
+        this.tel = tel;
+        this.sex = sex;
+        this.birth = birth;
+        this.photo = photo;
+        this.getup = getup;
+        this.breakfast = breakfast;
+        this.lunch = lunch;
+        this.dinner = dinner;
+        this.sleep = sleep;
+        this.updateTime = updateTime;
+        this.updateState = updateState;
+    }
+}

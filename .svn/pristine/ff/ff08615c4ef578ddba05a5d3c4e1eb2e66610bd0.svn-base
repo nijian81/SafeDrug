@@ -1,0 +1,137 @@
+package com.phhc.service;
+
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.telephony.TelephonyManager;
+
+import com.phhc.utils.App;
+import com.phhc.utils.CreateSQLiteDatabase;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+public class AnonymityRegisterService extends Service {
+
+    AnonymityRegister anonymityRegister;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase db;
+    String databaseName;
+    String userID_database;
+
+    public AnonymityRegisterService() {
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+
+        databaseName = "LocalDrugMessage";
+        databaseHelper = new CreateSQLiteDatabase(this, databaseName, null, 1);
+        try {
+            db = databaseHelper.getWritableDatabase();
+            String sql = "select * from anonymityRegister";
+            Cursor cursor = db.rawQuery(sql, null);
+            while (cursor.moveToNext()) {
+                userID_database = cursor.getString(3);
+            }
+            //如果标志flag为0则让其匿名注册，如果flag为1则拒绝匿名注册。
+            if (userID_database.length() == 0) {
+                anonymityRegister = new AnonymityRegister();
+                anonymityRegister.execute();
+            }
+            db.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+
+        }
+        super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    class AnonymityRegister extends AsyncTask<Object, Object, Object> {
+
+        @Override
+        protected Objects doInBackground(Object... params) {
+            //声明网址字符串
+            App app = (App)getApplication();
+            String uriAPI = app.getInterfaceUrl()+"guarder/api/user/AddUser";
+            //创建http post连接
+            //post运行变量必须用NameValuePair[]数组存储
+            HttpPost httpRequest = new HttpPost(uriAPI);
+            List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+            final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+            final String tmDevice, tmSerial, androidId;
+            tmDevice = "" + tm.getDeviceId();
+            tmSerial = "" + tm.getSimSerialNumber();
+            androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+            UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+            String deviceId = deviceUuid.toString();
+
+            params1.add(new BasicNameValuePair("dtype", "a"));
+            params1.add(new BasicNameValuePair("device", deviceId));
+            try {
+                //发出http request
+                httpRequest.setEntity(new UrlEncodedFormEntity(params1, HTTP.UTF_8));
+                //取得http response
+                HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+                //若状态码为200 ok
+                if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                    String strResult = EntityUtils.toString(httpResponse.getEntity());
+                    JSONObject jsonObject = new JSONObject(strResult);
+                    JSONObject jsonObjectData = jsonObject.getJSONObject("data");
+                    for (int i = 0; i < jsonObjectData.length(); i++) {
+                        String sysUser_ID = jsonObjectData.getString("sysUser_ID");
+                        db = databaseHelper.getWritableDatabase();
+                        String sql = "update anonymityRegister set sys_userID ='" + sysUser_ID + "',uuid ='" + deviceId + "',current_member_id ='" + sysUser_ID + "',current_member_portrait ='" + "tx4" + "',current_member_name ='" + "自己" + "'";
+                        db.execSQL(sql);
+//                        String sql2 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values('" + sysUser_ID + "','" + "自己" + "','" + "1" + "','" + "tx4" + "','" + "" + "','" + "男" + "','" + "" + "','" + "07:00" + "','" + "07:30" + "','" + "12:00" + "','" + "18:00" + "','" + "22:00" + "','" + "" + "','" + "0" + "')";
+//                        db.execSQL(sql2);
+                        db.close();
+                    }
+                } else {
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+}

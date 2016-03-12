@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/xmlWhiteLineColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_height="50dp"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/tips"
+            android:textColor="#000000"
+            android:textSize="@dimen/xmlDialogTextSize"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="提示" />
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_below="@+id/tips"
+            android:textColor="#393939"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/xmlDialogTextSize"
+            android:text="请确认以下药品信息，并生成提醒" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="#aaaaaa" />
+
+    <ListView
+        android:id="@+id/drugInfo"
+        android:layout_height="200dp"
+        android:dividerHeight="1dp"
+        android:layout_width="match_parent"
+        android:divider="#aaaaaa" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/drugInfo"
+        android:background="#aaaaaa" />
+
+    <RelativeLayout
+        android:layout_height="50dp"
+        android:paddingLeft="10dp"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_height="50dp"
+            android:layout_width="150dp"
+            android:text="@string/cancel"
+            android:layout_toLeftOf="@+id/line"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="#308c71" />
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="1dp"
+            android:layout_height="50dip"
+            android:layout_centerHorizontal="true"
+            android:background="#aaaaaa" />
+
+        <TextView
+            android:id="@+id/confirm"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/line"
+            android:text="确定"
+            android:layout_width="150dp"
+            android:textColor="#308c71"
+            android:textSize="20sp"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+</LinearLayout>

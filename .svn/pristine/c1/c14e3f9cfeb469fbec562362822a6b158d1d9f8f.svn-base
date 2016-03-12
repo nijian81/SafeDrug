@@ -1,0 +1,103 @@
+/*
+ * Copyright 2010 ZXing authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.zxing1.aztec;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * This implementation can detect and decode Aztec codes in an image.
+ *
+ * @author David Olivier
+ */
+public final class AztecReader implements com.google.zxing1.Reader {
+
+  /**
+   * Locates and decodes a Data Matrix code in an image.
+   *
+   * @return a String representing the content encoded by the Data Matrix code
+   * @throws com.google.zxing1.NotFoundException if a Data Matrix code cannot be found
+   * @throws com.google.zxing1.FormatException if a Data Matrix code cannot be decoded
+   */
+  @Override
+  public com.google.zxing1.Result decode(com.google.zxing1.BinaryBitmap image) throws com.google.zxing1.NotFoundException, com.google.zxing1.FormatException {
+    return decode(image, null);
+  }
+
+  @Override
+  public com.google.zxing1.Result decode(com.google.zxing1.BinaryBitmap image, Map<com.google.zxing1.DecodeHintType,?> hints)
+      throws com.google.zxing1.NotFoundException, com.google.zxing1.FormatException {
+
+    com.google.zxing1.NotFoundException notFoundException = null;
+    com.google.zxing1.FormatException formatException = null;
+    com.google.zxing1.aztec.detector.Detector detector = new com.google.zxing1.aztec.detector.Detector(image.getBlackMatrix());
+    com.google.zxing1.ResultPoint[] points = null;
+    com.google.zxing1.common.DecoderResult decoderResult = null;
+    try {
+      AztecDetectorResult detectorResult = detector.detect(false);
+      points = detectorResult.getPoints();
+      decoderResult = new com.google.zxing1.aztec.decoder.Decoder().decode(detectorResult);
+    } catch (com.google.zxing1.NotFoundException e) {
+      notFoundException = e;
+    } catch (com.google.zxing1.FormatException e) {
+      formatException = e;
+    }
+    if (decoderResult == null) {
+      try {
+        AztecDetectorResult detectorResult = detector.detect(true);
+        points = detectorResult.getPoints();
+        decoderResult = new com.google.zxing1.aztec.decoder.Decoder().decode(detectorResult);
+      } catch (com.google.zxing1.NotFoundException | com.google.zxing1.FormatException e) {
+        if (notFoundException != null) {
+          throw notFoundException;
+        }
+        if (formatException != null) {
+          throw formatException;
+        }
+        throw e;
+      }
+    }
+
+    if (hints != null) {
+      com.google.zxing1.ResultPointCallback rpcb = (com.google.zxing1.ResultPointCallback) hints.get(com.google.zxing1.DecodeHintType.NEED_RESULT_POINT_CALLBACK);
+      if (rpcb != null) {
+        for (com.google.zxing1.ResultPoint point : points) {
+          rpcb.foundPossibleResultPoint(point);
+        }
+      }
+    }
+
+    com.google.zxing1.Result result = new com.google.zxing1.Result(decoderResult.getText(), decoderResult.getRawBytes(), points, com.google.zxing1.BarcodeFormat.AZTEC);
+    
+    List<byte[]> byteSegments = decoderResult.getByteSegments();
+    if (byteSegments != null) {
+      result.putMetadata(com.google.zxing1.ResultMetadataType.BYTE_SEGMENTS, byteSegments);
+    }
+    String ecLevel = decoderResult.getECLevel();
+    if (ecLevel != null) {
+      result.putMetadata(com.google.zxing1.ResultMetadataType.ERROR_CORRECTION_LEVEL, ecLevel);
+    }
+    
+    return result;
+  }
+
+  @Override
+  public void reset() {
+    // do nothing
+  }
+
+}

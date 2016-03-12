@@ -1,0 +1,452 @@
+package com.phhc.drugRemind;
+
+import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.phhc.R;
+import com.phhc.utils.App;
+import com.phhc.utils.CreateSQLiteDatabase;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class AddTakeDrugPeopleDialogFragment extends DialogFragment {
+
+    ProgressDialog progressDialog;
+    ImageView tx1, tx2, tx3, tx4, tx5, tx6, tx7, tx8, back;
+    TextView save;
+    //代表用户选择的头像
+    String portrait_id = "tx4", userName, nameParam;
+    EditText name;
+    ConfirmInterface listener;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase db;
+    String databaseName, member_id_from_server;
+
+    //定制fragmentDialog弹出动作
+    @Override
+    public void onActivityCreated(Bundle arg0) {
+        super.onActivityCreated(arg0);
+        getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+    }
+
+    public static AddTakeDrugPeopleDialogFragment newInstance(int title) {
+        AddTakeDrugPeopleDialogFragment frag = new AddTakeDrugPeopleDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("patient", "2");
+        frag.setArguments(args);
+        return frag;
+    }
+
+    public interface ConfirmInterface {
+        public void onConfirmInterface(String portrait, String name);
+    }
+
+    public void setConfirmInterface(ConfirmInterface listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        databaseName = "LocalDrugMessage";
+        databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName, null, 1);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.add_take_drug_people_dialog, container, false);
+
+        nameParam = getArguments().getString("name");
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.BOTTOM);
+        //返回
+        back = (ImageView) rootView.findViewById(R.id.back);
+        back.setOnClickListener(new MyClickBackListener());
+        //保存
+        save = (TextView) rootView.findViewById(R.id.save);
+        save.setOnClickListener(new MyClickSaveListener());
+        //名字
+        name = (EditText) rootView.findViewById(R.id.name);
+        //8个头像
+        tx1 = (ImageView) rootView.findViewById(R.id.tx1);
+        tx1.setOnClickListener(new MyClickChangeSelectTx1Listener());
+        tx2 = (ImageView) rootView.findViewById(R.id.tx2);
+        tx2.setOnClickListener(new MyClickChangeSelectTx2Listener());
+        tx3 = (ImageView) rootView.findViewById(R.id.tx3);
+        tx3.setOnClickListener(new MyClickChangeSelectTx3Listener());
+        tx4 = (ImageView) rootView.findViewById(R.id.tx4);
+        tx4.setOnClickListener(new MyClickChangeSelectTx4Listener());
+        tx5 = (ImageView) rootView.findViewById(R.id.tx5);
+        tx5.setOnClickListener(new MyClickChangeSelectTx5Listener());
+        tx6 = (ImageView) rootView.findViewById(R.id.tx6);
+        tx6.setOnClickListener(new MyClickChangeSelectTx6Listener());
+        tx7 = (ImageView) rootView.findViewById(R.id.tx7);
+        tx7.setOnClickListener(new MyClickChangeSelectTx7Listener());
+        tx8 = (ImageView) rootView.findViewById(R.id.tx8);
+        tx8.setOnClickListener(new MyClickChangeSelectTx8Listener());
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    //点击确认监视器 尼见 2015-03-26
+    class MyClickAddListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            dismiss();
+        }
+    }
+
+    //点击取消监视器 尼见 2015-03-26
+    class MyClickCancelTextViewListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            dismiss();
+        }
+    }
+
+    //选中头像1监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx1Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.xz1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx1";
+        }
+    }
+
+    //选中头像2监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx2Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.xz2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx2";
+        }
+    }
+
+    //选中头像3监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx3Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.xz3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx3";
+        }
+    }
+
+    //选中头像4监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx4Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.xz4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx4";
+        }
+    }
+
+    //选中头像5监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx5Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.xz5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx5";
+        }
+    }
+
+    //选中头像6监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx6Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.xz6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx6";
+        }
+    }
+
+    //选中头像7监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx7Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.xz7);
+            tx8.setImageResource(R.drawable.tx8);
+            portrait_id = "tx7";
+        }
+    }
+
+    //选中头像8监视器 尼见 2015-03-26
+    class MyClickChangeSelectTx8Listener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            tx1.setImageResource(R.drawable.tx1);
+            tx2.setImageResource(R.drawable.tx2);
+            tx3.setImageResource(R.drawable.tx3);
+            tx4.setImageResource(R.drawable.tx4);
+            tx5.setImageResource(R.drawable.tx5);
+            tx6.setImageResource(R.drawable.tx6);
+            tx7.setImageResource(R.drawable.tx7);
+            tx8.setImageResource(R.drawable.xz8);
+            portrait_id = "tx8";
+        }
+    }
+
+    //点击返回监视器 尼见 2015-03-26
+    class MyClickBackListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            SelectTakeDrugPeopleDialogFragment selectTakeDrugPeopleDialogFragment = new SelectTakeDrugPeopleDialogFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("name", nameParam);
+            selectTakeDrugPeopleDialogFragment.setArguments(bundle);
+            selectTakeDrugPeopleDialogFragment.show(getActivity().getFragmentManager(), "selectTakeDrugPeopleDialogFragment");
+            dismiss();
+        }
+    }
+
+    //点击保存监视器 尼见 2015-03-26
+    class MyClickSaveListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            InputMethodManager imm = (InputMethodManager) getActivity()
+                    .getSystemService(getActivity().INPUT_METHOD_SERVICE);
+            // 显示或者隐藏输入法
+            imm.hideSoftInputFromWindow(name.getWindowToken(), 0);
+            //判断昵称是否为空
+            if (name.getText().toString().length() == 0) {
+
+                AlertDialog dialog = getAlertDialogWithUserNameIsNull();
+                dialog.show();
+
+                return;
+            }
+            progressDialog = ProgressDialog.show(getActivity(), null, "数据加载中，请稍后...");
+            new AddMember().execute();
+
+        }
+
+        //昵称不能为空提示框 尼见 2015-03-26
+        AlertDialog getAlertDialogWithUserNameIsNull() {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                    AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+            builder.setTitle("提示");
+            builder.setMessage("昵称不能为空");
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            return dialog;
+        }
+    }
+
+    //在工作线程中调用添加成员接口 尼见 2015-03-30
+    class AddMember extends AsyncTask<Object, Object, Object> {
+
+        @Override
+        protected Objects doInBackground(Object... params) {
+
+            //调用生成用药时间点接口 尼见 2015-03-27
+            //声明网址字符串
+            App app = (App)getActivity().getApplication();
+            String uriAPI2 = app.getInterfaceUrl()+"guarder/api/user/SaveMember";
+            HttpPost httpRequest2 = new HttpPost(uriAPI2);
+            List<NameValuePair> params2 = new ArrayList<NameValuePair>();
+            //获取当前时间
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date curDate = new Date(System.currentTimeMillis());
+            String localTimeStamp = formatter.format(curDate);
+            db = databaseHelper.getWritableDatabase();
+            String sql = "select * from anonymityRegister";
+            Cursor cursor = db.rawQuery(sql, null);
+            String userID = null;
+            while (cursor.moveToNext()) {
+                userID = cursor.getString(3);
+            }
+            params2.add(new BasicNameValuePair("userID", userID));
+            params2.add(new BasicNameValuePair("memberID", ""));
+            params2.add(new BasicNameValuePair("nick", userName));
+            params2.add(new BasicNameValuePair("sex", "1"));
+            params2.add(new BasicNameValuePair("birth", ""));
+            params2.add(new BasicNameValuePair("tel", ""));
+            params2.add(new BasicNameValuePair("photo", portrait_id));
+            params2.add(new BasicNameValuePair("isDel", "0"));
+            try {
+                //发出http request
+                httpRequest2.setEntity(new UrlEncodedFormEntity(params2, HTTP.UTF_8));
+                //取得http response
+                HttpResponse httpResponse2 = new DefaultHttpClient().execute(httpRequest2);
+                //若状态码为200 ok
+                if (httpResponse2.getStatusLine().getStatusCode() == 200) {
+                    String strResult2 = EntityUtils.toString(httpResponse2.getEntity());
+                    JSONObject jsonObject2 = new JSONObject(strResult2);
+                    //成功接受到服务器返回数据之后，结束进度等待窗口
+                    progressDialog.dismiss();
+                    JSONObject jsonObject = jsonObject2.getJSONObject("data");
+                    String sysUser_ID = jsonObject.getString("sysUser_ID");
+                    member_id_from_server = sysUser_ID;
+                    //用户名
+                    userName = name.getText().toString();
+                    db = databaseHelper.getWritableDatabase();
+                    String familyMemberUserID = java.util.UUID.randomUUID().toString();
+                    String sql2 = "insert into MemberInfoTable (memberID, name, isFamily, photo, tel, sex, birth, getup, breakfast, lunch, dinner, sleep, updateTime, updateState) values ('" + member_id_from_server + "','" + userName + "','" + "0" + "','" + portrait_id + "','" + "" + "','" + "" + "','" + "" + "','" + "07:00" + "','" + "07:30" + "','" + "12:00" + "','" + "19:00" + "','" + "21:00" + "','" + "" + "','" + "1" + "')";
+                    db.execSQL(sql2);
+                    //设置点击之后更新数据库中当前服药人
+                    String sql1 = "update anonymityRegister set current_member_id ='" + member_id_from_server + "',current_member_portrait ='" + portrait_id + "',current_member_name ='" + userName + "'";
+                    db.execSQL(sql1);
+                    //提示用户添加成员成功
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+
+                            AlertDialog dialog = getAlertDialogWithAddMemberSuccess();
+                            dialog.show();
+
+                        }
+                    });
+                    //调用接口，同步用药提醒界面的头像和昵称显示
+                    listener.onConfirmInterface(portrait_id, userName);
+                    db.close();
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            db.close();
+            return null;
+        }
+
+        //添加成员成功提示框 尼见 2015-03-26
+        AlertDialog getAlertDialogWithAddMemberSuccess() {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                    AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+            builder.setTitle("提示");
+            builder.setMessage("添加成员成功");
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ConfirmTakeDrugMemberRelaxTimeDialogFragment confirmTakeDrugMemberRelaxTimeDialogFragment = new ConfirmTakeDrugMemberRelaxTimeDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("name", name.getText().toString());
+                    confirmTakeDrugMemberRelaxTimeDialogFragment.setArguments(bundle);
+                    confirmTakeDrugMemberRelaxTimeDialogFragment.show(getActivity().getFragmentManager(), "confirmTakeDrugMemberRelaxTimeDialogFragment");
+                    dismiss();
+                }
+            });
+            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            return dialog;
+        }
+    }
+
+}

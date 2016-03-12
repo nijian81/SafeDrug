@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/xmlWhiteLineColor"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp" >
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/xmlDialogTextMargin"
+            android:text="取消"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:textSize="@dimen/xmlDialogTextSize" />
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="每次"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:textSize="@dimen/xmlDialogTextSize" />
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/xmlDialogTextMargin"
+            android:text="确认"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:textSize="@dimen/xmlDialogTextSize" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@color/xmlDialogGreenTextColor" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:paddingLeft="10dp" >
+
+        <EditText
+            android:id="@+id/num"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:background="@null"
+            android:inputType="numberDecimal" />
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dip"
+            android:layout_below="@+id/num"
+            android:layout_marginLeft="20dp"
+            android:background="#D3D3D3" />
+
+        <NumberPicker
+            android:id="@+id/desc"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp" />
+    </RelativeLayout>
+
+</LinearLayout>

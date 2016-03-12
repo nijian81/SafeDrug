@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/xmlWhiteLineColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/man_relative"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/man"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/man"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+        <ImageView
+            android:id="@+id/mark_man"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="visible"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+        <View
+            android:layout_below="@+id/man"
+            android:layout_height="1dp"
+            android:layout_width="wrap_content"
+            android:background="@color/xmlGrayLineColor" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/woman_relative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/woman"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/woman"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+        <ImageView
+            android:id="@+id/mark_woman"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/duigou" />
+
+        <View
+            android:layout_below="@+id/woman"
+            android:layout_height="1dp"
+            android:layout_width="wrap_content"
+            android:background="@color/xmlGrayLineColor" />
+    </RelativeLayout>
+</LinearLayout>

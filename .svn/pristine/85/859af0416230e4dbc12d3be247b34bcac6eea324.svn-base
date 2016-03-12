@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <TextView
+            android:id="@+id/currentPeople"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="@string/myself"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:drawableRight="@drawable/head_name_image"
+            android:drawableTop="@drawable/tx4"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/addDrug"
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:layout_margin="10dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/tjyp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="49dp"
+        android:layout_width="match_parent"
+        android:background="@color/xmlMiddleContentBackgroundColor">
+
+        <ImageView
+            android:id="@+id/beforeDay"
+            android:layout_toLeftOf="@+id/date"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:src="@drawable/syt" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="2015-03-10"
+            android:textSize="14sp"
+            android:layout_centerInParent="true"
+            android:drawablePadding="20dp" />
+
+        <ImageView
+            android:id="@+id/nextDay"
+            android:layout_marginLeft="40dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@+id/date"
+            android:layout_centerVertical="true"
+            android:src="@drawable/xyt" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="350dp"
+        android:layout_width="match_parent">
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/banyuanhuan" />
+
+        <ImageView
+            android:id="@+id/dayuan"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/dayuan" />
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/logo" />
+
+        <ImageView
+            android:layout_height="40dp"
+            android:layout_width="21dp"
+            android:layout_marginBottom="90dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/sanjiao" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dayuanhuan"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+</LinearLayout>

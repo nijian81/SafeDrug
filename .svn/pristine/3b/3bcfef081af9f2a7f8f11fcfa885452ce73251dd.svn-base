@@ -1,0 +1,14 @@
+package cn.com.phhc.drugSafeApp.Constant;
+
+/**
+ * 
+ * @author lenovo 定义全局常量
+ *
+ */
+
+public class Constant {
+
+	//用于存储顶部标题栏高度
+	public static int height;
+
+}

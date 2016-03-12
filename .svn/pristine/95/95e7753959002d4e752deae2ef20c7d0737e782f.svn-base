@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cn.com.phhc.drugSafeApp"
+    android:versionCode="1"
+    android:versionName="1.1" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <uses-permission android:name="android.permission.SET_DEBUG_APP" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:name="cn.com.phhc.drugSafeApp.utils.App"
+        android:allowBackup="true"
+        android:icon="@drawable/login_logo"
+        android:installLocation="preferExternal"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="cn.com.phhc.drugSafeApp.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.phhc.drugSafeApp.welcomePageActivity.WelcomePageActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.WELCOME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.phhc.drugSafeApp.drugQuery.BarcodeScannerActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.BARCODE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- 加上点表示引用配置文件中com.phhc包的路径 -->
+        <service
+            android:name=".service.AnonymityRegisterService"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="cn.com.phhc.drugSafeApp.service.AnonymityRegisterService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.CaptureActivity"
+            android:clearTaskOnLaunch="true"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+            <intent-filter>
+                <action android:name="com.google.zxing.client.android.SCAN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- Allow web apps to launch Barcode Scanner by linking to http://zxing.appspot.com/scan. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="zxing.appspot.com"
+                    android:path="/scan"
+                    android:scheme="http" />
+            </intent-filter>
+            <!-- We also support a Google Product Search URL. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.google.com"
+                    android:path="/m/products/scan"
+                    android:scheme="http" />
+            </intent-filter>
+            <!-- And the UK version. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.google.co.uk"
+                    android:path="/m/products/scan"
+                    android:scheme="http" />
+            </intent-filter>
+            <!-- Support zxing://scan/?... like iPhone app -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="scan"
+                    android:path="/"
+                    android:scheme="zxing" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.PreferencesActivity"
+            android:label="@string/preferences_name"
+            android:stateNotNeeded="true" />
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.encode.EncodeActivitytivity"
+            android:stateNotNeeded="true" >
+            <intent-filter>
+                <action android:name="com.google.zxing.client.android.ENCODE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- This allows us to handle the Share button in Contacts. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/x-vcard" />
+            </intent-filter>
+            <!-- This allows us to handle sharing any plain text . -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.book.SearchBookContentsActivitytivity"
+            android:label="@string/sbc_name"
+            android:screenOrientation="sensorLandscape"
+            android:stateNotNeeded="true" >
+            <intent-filter>
+                <action android:name="com.google.zxing.client.android.SEARCH_BOOK_CONTENTS" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ancn.com.google.zxing1.client.android1.share.ShareActivityhareActivity"
+            android:screenOrientation="user"
+            android:stateNotNeeded="true" >
+            <intent-filter>
+                <action android:name="com.google.zxing.client.android.SHARE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ancn.com.google.zxing1.client.android1.history.HistoryActivitytoryActivity"
+            android:label="@string/history_title"
+            android:stateNotNeeded="true" />
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.share.BookmarkPickerActivitykPickerActivity"
+            android:label="@string/bookmark_picker_name"
+            android:stateNotNeeded="true" />
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.share.AppPickerActivitypPickerActivity"
+            android:label="@string/app_picker_name"
+            android:stateNotNeeded="true" />
+        <activity
+            android:name="cn.com.google.zxing1.client.android1.HelpActivity"
+            android:label="@string/menu_help"
+            android:screenOrientation="user"
+            android:stateNotNeeded="true" />
+    </application>
+
+</manifest>

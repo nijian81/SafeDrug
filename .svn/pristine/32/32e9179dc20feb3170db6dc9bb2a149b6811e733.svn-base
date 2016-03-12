@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/xmlWhiteLineColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_height="50dp"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/xmlDialogTextSize"
+            android:layout_marginLeft="@dimen/xmlDialogTextMargin"
+            android:layout_alignParentLeft="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="取消" />
+
+        <TextView
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/pleaseSelectTakeDrugPeople"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/xmlDialogTextSize" />
+
+        <ImageView
+            android:id="@+id/add"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/xmlDialogTextMargin"
+            android:layout_alignParentRight="true"
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:src="@drawable/add_family_member" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="#000000" />
+
+    <com.phhc.utils.HorizontalListView
+        android:id="@+id/listView"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_height="100dp">
+
+    </com.phhc.utils.HorizontalListView>
+
+    <RelativeLayout
+        android:layout_height="90dp"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="15dp">
+
+        <ImageView
+            android:id="@+id/portrait_under"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:src="@drawable/tx5"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/name_under"
+            android:layout_below="@+id/portrait_under"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_marginLeft="20dp"
+            android:text="AAA" />
+
+    </RelativeLayout>
+
+</LinearLayout>

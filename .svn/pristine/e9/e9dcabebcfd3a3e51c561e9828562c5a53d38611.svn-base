@@ -1,0 +1,494 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+public class ModifyMemberInformationFragment extends Fragment {
+
+    ImageButton back;
+    FamilyMemberManageFragment familyMemberManageFragment;
+    CreateSQLiteDatabase databaseHelper;
+    SQLiteDatabase db;
+    String databaseName, portrait_database = "", honeyName_database = "", sex_database = "", cellphoneNum_database = "", birthday_database = "";
+    TextView text_under_portrait, honey_name_text_view, sex_text_view, cellphone_text_view, birthday_text_view, save, title;
+    ImageView portraitImage;
+    RelativeLayout portrait, honey_name, sex, cellphone, birthday, relax_time, delete;
+    int year_database, month_database, day_database;
+    String itemName;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        databaseName = "LocalDrugMessage";
+        databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName, null, 1);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Bundle bundle = this.getArguments();
+        itemName = bundle.getString("name", "");
+        View rootView = inflater.inflate(R.layout.modify_member_information, container, false);
+        //标题
+        title = (TextView) rootView.findViewById(R.id.title);
+        title.setText(itemName + "的个人信息");
+        //返回
+        back = (ImageButton) rootView.findViewById(R.id.back);
+        back.setOnClickListener(new MyClickBackListener());
+        //头像
+        portrait = (RelativeLayout) rootView.findViewById(R.id.portrait);
+        portrait.setOnClickListener(new MyClickPortraitListener());
+        portraitImage = (ImageView) rootView.findViewById(R.id.portrait_image);
+        //昵称
+        honey_name = (RelativeLayout) rootView.findViewById(R.id.honey_name);
+        honey_name.setOnClickListener(new MyClickHoneyNameListener());
+        honey_name_text_view = (TextView) rootView.findViewById(R.id.honey_name_edit_text);
+        text_under_portrait = (TextView) rootView.findViewById(R.id.text_under_portrait);
+        //性别
+        sex = (RelativeLayout) rootView.findViewById(R.id.sex);
+        sex.setOnClickListener(new MyClickSexListener());
+        sex_text_view = (TextView) rootView.findViewById(R.id.sex_text_view);
+        //手机号
+        cellphone = (RelativeLayout) rootView.findViewById(R.id.cellphone);
+        cellphone.setOnClickListener(new MyClickCellphoneNumListener());
+        cellphone_text_view = (TextView) rootView.findViewById(R.id.cellphone_text_view);
+        //生日
+        birthday = (RelativeLayout) rootView.findViewById(R.id.birthday);
+        birthday.setOnClickListener(new MyClickBirthdayListener());
+        birthday_text_view = (TextView) rootView.findViewById(R.id.birthday_text_view);
+        //作息时间
+        relax_time = (RelativeLayout) rootView.findViewById(R.id.relax_time);
+        relax_time.setOnClickListener(new MyClickRelaxTimeListener());
+        //保存
+        save = (TextView) rootView.findViewById(R.id.save);
+        save.setOnClickListener(new MyClickSaveListener());
+        //删除
+        delete = (RelativeLayout) rootView.findViewById(R.id.delete);
+        delete.setOnClickListener(new MyClickDeleteListener());
+        //查数据库去初始化有关视图
+        String sql = "select * from MemberInfoTable where name = '" + itemName + "'";
+        db = databaseHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            portrait_database = cursor.getString(3);
+            honeyName_database = cursor.getString(1);
+            sex_database = cursor.getString(5);
+            cellphoneNum_database = cursor.getString(4);
+            birthday_database = cursor.getString(6);
+        }
+        if (!birthday_database.equals("")) {
+            String birthday_split[] = birthday_database.split("-");
+            year_database = Integer.parseInt(birthday_split[0]);
+            month_database = Integer.parseInt(birthday_split[1]);
+            day_database = Integer.parseInt(birthday_split[2]);
+        }
+        db.close();
+        switch (portrait_database) {
+            case "tx1":
+                portraitImage.setImageResource(R.drawable.tx1);
+                break;
+            case "tx2":
+                portraitImage.setImageResource(R.drawable.tx2);
+                break;
+            case "tx3":
+                portraitImage.setImageResource(R.drawable.tx3);
+                break;
+            case "tx4":
+                portraitImage.setImageResource(R.drawable.tx4);
+                break;
+            case "tx5":
+                portraitImage.setImageResource(R.drawable.tx5);
+                break;
+            case "tx6":
+                portraitImage.setImageResource(R.drawable.tx6);
+                break;
+            case "tx7":
+                portraitImage.setImageResource(R.drawable.tx7);
+                break;
+            case "tx8":
+                portraitImage.setImageResource(R.drawable.tx8);
+                break;
+        }
+        honey_name_text_view.setText(honeyName_database);
+        text_under_portrait.setText(honeyName_database);
+        sex_text_view.setText(sex_database);
+        cellphone_text_view.setText(cellphoneNum_database);
+        birthday_text_view.setText(birthday_database);
+        //表示添加成员信息，初试的时候不显示其他数据
+
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+    //点击头像监视器 尼见 2015-03-03
+    class MyClickPortraitListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            SelectPortraitDialogFragment selectPortraitDialogFragment = SelectPortraitDialogFragment.newInstance(1);
+            selectPortraitDialogFragment.setConfirmInterface(new SelectPortraitDialogFragment.ConfirmInterface() {
+
+                @Override
+                public void onConfirmInterface(String portrait) {
+                    switch (portrait) {
+                        case "1":
+                            portraitImage.setImageResource(R.drawable.tx1);
+                            portrait_database = "tx1";
+                            break;
+                        case "2":
+                            portraitImage.setImageResource(R.drawable.tx2);
+                            portrait_database = "tx2";
+                            break;
+                        case "3":
+                            portraitImage.setImageResource(R.drawable.tx3);
+                            portrait_database = "tx3";
+                            break;
+                        case "4":
+                            portraitImage.setImageResource(R.drawable.tx4);
+                            portrait_database = "tx4";
+                            break;
+                        case "5":
+                            portraitImage.setImageResource(R.drawable.tx5);
+                            portrait_database = "tx5";
+                            break;
+                        case "6":
+                            portraitImage.setImageResource(R.drawable.tx6);
+                            portrait_database = "tx6";
+                            break;
+                        case "7":
+                            portraitImage.setImageResource(R.drawable.tx7);
+                            portrait_database = "tx7";
+                            break;
+                        case "8":
+                            portraitImage.setImageResource(R.drawable.tx8);
+                            portrait_database = "tx8";
+                            break;
+                        default:
+                            portraitImage.setImageResource(R.drawable.tx1);
+                            portrait_database = "tx1";
+                            break;
+                    }
+                }
+            });
+            selectPortraitDialogFragment.show(getActivity().getFragmentManager(), "selectPortraitDialogFragment");
+
+        }
+
+    }
+
+    //点击昵称监视器 尼见 2015-03-03
+    class MyClickHoneyNameListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            ChangeHoneyNameDialogFragment changeHoneyNameDialogFragment = ChangeHoneyNameDialogFragment.newInstance(1);
+            changeHoneyNameDialogFragment.setConfirmInterface(new ChangeHoneyNameDialogFragment.ConfirmInterface() {
+
+                @Override
+                public void onConfirmInterface(String honeyName) {
+                    honeyName_database = honeyName;
+                    text_under_portrait.setText(honeyName);
+                    honey_name_text_view.setText(honeyName);
+                }
+            });
+            changeHoneyNameDialogFragment.show(getActivity().getFragmentManager(), "selectPortraitDialogFragment");
+
+        }
+    }
+
+    //点击返回监视器 尼见 2015-03-03
+    class MyClickBackListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            familyMemberManageFragment = new FamilyMemberManageFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+            fragmentTransaction.replace(R.id.login_fragment, familyMemberManageFragment, "familyMemberManageFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //点击性别监视器 尼见 2015-03-04
+    class MyClickSexListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            ChangeSexDialogFragment changeSexDialogFragment = ChangeSexDialogFragment.newInstance("男");
+            changeSexDialogFragment.setConfirmInterface(new ChangeSexDialogFragment.ConfirmInterface() {
+
+                //接口回调实现通信
+                @Override
+                public void onConfirmInterface(String sex) {
+                    switch (sex) {
+                        case "man":
+                            sex_text_view.setText("男");
+                            sex_database = "男";
+                            break;
+                        case "woman":
+                            sex_text_view.setText("女");
+                            sex_database = "女";
+                            break;
+                    }
+                }
+            });
+            changeSexDialogFragment.show(getActivity().getFragmentManager(), "changeSexDialogFragment");
+
+        }
+    }
+
+    //点击手机号监视器 尼见 2015-03-04
+    class MyClickCellphoneNumListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            InputCellphoneNumDialogFragment inputCellphoneNumDialogFragment = InputCellphoneNumDialogFragment.newInstance(1);
+            inputCellphoneNumDialogFragment.setConfirmInterface(new InputCellphoneNumDialogFragment.ConfirmInterface() {
+
+                //接口回调实现通信
+                @Override
+                public void onConfirmInterface(String cellphoneNum) {
+                    cellphoneNum_database = cellphoneNum;
+                    cellphone_text_view.setText(cellphoneNum);
+                }
+            });
+            inputCellphoneNumDialogFragment.show(getActivity().getFragmentManager(), "changeSexDialogFragment");
+
+        }
+    }
+
+    //点击生日监视器 尼见 2015-03-04
+    class MyClickBirthdayListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            InputBirthdayDialogFragment inputBirthdayDialogFragment = InputBirthdayDialogFragment.newInstance(year_database, month_database, day_database);
+            inputBirthdayDialogFragment.setConfirmInterface(new InputBirthdayDialogFragment.ConfirmInterface() {
+
+                //接口回调实现通信
+                @Override
+                public void onConfirmInterface(int year, int month, int day) {
+                    String month_show;
+                    String day_show;
+                    if (month <= 9) {
+                        month_show = "0" + month;
+                    } else {
+                        month_show = Integer.toString(month);
+                    }
+                    if (day <= 9) {
+                        day_show = "0" + day;
+                    } else {
+                        day_show = Integer.toString(day);
+                    }
+                    birthday_text_view.setText(year + "-" + month_show + "-" + day_show);
+                    birthday_database = year + "-" + month_show + "-" + day_show;
+                }
+            });
+            inputBirthdayDialogFragment.show(getActivity().getFragmentManager(), "inputBirthdayDialogFragment");
+
+        }
+    }
+
+    //点击作息时间监视器 尼见 2015-03-04
+    class MyClickRelaxTimeListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            RelaxTimeFragment relaxTimeFragment = new RelaxTimeFragment();
+            Bundle bundle = new Bundle();
+            //设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+            bundle.putString("itemName", itemName);
+            bundle.putInt("isMyself", 0);
+            relaxTimeFragment.setArguments(bundle);
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, relaxTimeFragment, "relaxTimeFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //点击保存监视器 尼见 2015-03-04
+    class MyClickSaveListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            //昵称为空
+            if (honeyName_database.length() == 0) {
+
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        AlertDialog dialog = getAlertDialogWithHoneyNameIsNULL();
+                        dialog.show();
+                    }
+                });
+
+                return;
+            }
+            //如果isMyself标志位是1，表示为更新个人信息，调用update语句更新数据库
+            db = databaseHelper.getWritableDatabase();
+            String sql = "update MemberInfoTable set photo ='" + portrait_database + "' , name ='" + honeyName_database + "' , sex ='" + sex_database + "' , tel ='" + cellphoneNum_database + "' , birth ='" + birthday_database + "' where name ='" + itemName + "'";
+            db.execSQL(sql);
+            db.close();
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    AlertDialog dialog = getAlertDialogWithSaveSuccess();
+                    dialog.show();
+                }
+            });
+
+        }
+    }
+
+    //保存成功提示框 尼见 2015-03-04
+    AlertDialog getAlertDialogWithSaveSuccess() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+        builder.setTitle("提示");
+        builder.setMessage("修改成员信息成功!");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                familyMemberManageFragment = new FamilyMemberManageFragment();
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                fragmentTransaction.replace(R.id.login_fragment, familyMemberManageFragment, "familyMemberManageFragment");
+                fragmentTransaction.commit();
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        return dialog;
+    }
+
+    //添加成员信息成功 尼见 2015-03-04
+    AlertDialog getAlertDialogWithAddSuccess() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+        builder.setTitle("提示");
+        builder.setMessage("添加成员成功!");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                familyMemberManageFragment = new FamilyMemberManageFragment();
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                fragmentTransaction.replace(R.id.login_fragment, familyMemberManageFragment, "familyMemberManageFragment");
+                fragmentTransaction.commit();
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        return dialog;
+    }
+
+    //昵称为空提示框提示框 尼见 2015-03-05
+    AlertDialog getAlertDialogWithHoneyNameIsNULL() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+        builder.setTitle("提示");
+        builder.setMessage("昵称不能为空!");
+        builder.setPositiveButton("确定", null);
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        return dialog;
+    }
+
+    //点击删除监视器 尼见 2015-03-11
+    class MyClickDeleteListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            db = databaseHelper.getWritableDatabase();
+            String sql = "delete from MemberInfoTable where name = '" + itemName + "'";
+            db.execSQL(sql);
+            db.close();
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    AlertDialog dialog = getAlertDialogWithDeleteSuccess();
+                    dialog.show();
+                }
+            });
+        }
+    }
+
+    //删除成功提示框 尼见 2015-03-11
+    AlertDialog getAlertDialogWithDeleteSuccess() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+                AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+        builder.setTitle("提示");
+        builder.setMessage("删除成员信息成功!");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager
+                        .beginTransaction();
+                familyMemberManageFragment = new FamilyMemberManageFragment();
+                fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                fragmentTransaction.replace(R.id.login_fragment, familyMemberManageFragment, "familyMemberManageFragment");
+                fragmentTransaction.commit();
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        return dialog;
+    }
+
+}
+
+

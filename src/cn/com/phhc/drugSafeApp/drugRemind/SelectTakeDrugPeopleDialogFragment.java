@@ -1,0 +1,409 @@
+package cn.com.phhc.drugSafeApp.drugRemind;
+
+/**
+ * 选择服药人对话框
+ */
+
+import java.util.ArrayList;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.HorizontalListView;
+import cn.com.phhc.drugSafeApp.utils.MemberItem;
+import cn.com.phhc.drugSafeApp.utils.TakeDrugPeopleItemAdapter;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class SelectTakeDrugPeopleDialogFragment extends DialogFragment {
+
+	ImageView add, portrait_under;
+	TextView cancel, name_under;
+	String portrait_under_flag = "tx4", current_member_name;
+	ConfirmInterface listener;
+	CreateSQLiteDatabase databaseHelper;
+	ArrayList<MemberItem> list;
+	SQLiteDatabase db;
+	TakeDrugPeopleItemAdapter takeDrugPeopleItemAdapter;
+	String databaseName, current_member_id;
+	HorizontalListView listView;
+	int num = 0;
+	int flag = 0;
+
+	// 定制fragmentDialog弹出动作
+	@Override
+	public void onActivityCreated(Bundle arg0) {
+		super.onActivityCreated(arg0);
+		getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+	}
+
+	public static SelectTakeDrugPeopleDialogFragment newInstance(int title) {
+		SelectTakeDrugPeopleDialogFragment frag = new SelectTakeDrugPeopleDialogFragment();
+		Bundle args = new Bundle();
+		args.putString("patient", "2");
+		frag.setArguments(args);
+		return frag;
+	}
+
+	public interface ConfirmInterface {
+		public void onConfirmInterface(String portrait, String name);
+	}
+
+	public void setConfirmInterface(ConfirmInterface listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(
+				R.layout.select_take_drug_people_dialog, container, false);
+
+		current_member_name = getArguments().getString("name");
+		getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+		Window window = getDialog().getWindow();
+		window.setGravity(Gravity.BOTTOM);
+		// 底部名字
+		name_under = (TextView) rootView.findViewById(R.id.name_under);
+		// 底部头像
+		portrait_under = (ImageView) rootView.findViewById(R.id.portrait_under);
+		portrait_under.setOnClickListener(new MyClickUnderPersonListener());
+		// 水平listView
+		listView = (HorizontalListView) rootView.findViewById(R.id.listView);
+		// 对显示页面进行初始化
+		db = databaseHelper.getWritableDatabase();
+		String sql = "select * from MemberInfoTable";
+		Cursor cursor = db.rawQuery(sql, null);
+		list = new ArrayList<MemberItem>();
+		String portrait, name;
+		takeDrugPeopleItemAdapter = new TakeDrugPeopleItemAdapter();
+		takeDrugPeopleItemAdapter.setContext(getActivity());
+		while (cursor.moveToNext()) {
+			if (num == 4) {
+				flag = num;
+				num = 0;
+				portrait = cursor.getString(3);
+				portrait_under_flag = portrait;
+				name = cursor.getString(1);
+				name_under.setVisibility(View.VISIBLE);
+				portrait_under.setVisibility(View.VISIBLE);
+				name_under.setText(name);
+				if (name.equals(current_member_name)) {
+					switch (portrait) {
+					case "tx1":
+						portrait_under.setImageResource(R.drawable.xz1);
+						break;
+					case "tx2":
+						portrait_under.setImageResource(R.drawable.xz2);
+						break;
+					case "tx3":
+						portrait_under.setImageResource(R.drawable.xz3);
+						break;
+					case "tx4":
+						portrait_under.setImageResource(R.drawable.xz4);
+						break;
+					case "tx5":
+						portrait_under.setImageResource(R.drawable.xz5);
+						break;
+					case "tx6":
+						portrait_under.setImageResource(R.drawable.xz6);
+						break;
+					case "tx7":
+						portrait_under.setImageResource(R.drawable.xz7);
+						break;
+					case "tx8":
+						portrait_under.setImageResource(R.drawable.xz8);
+						break;
+					default:
+						portrait_under.setImageResource(R.drawable.xz4);
+						break;
+					}
+				} else {
+					switch (portrait) {
+					case "tx1":
+						portrait_under.setImageResource(R.drawable.tx1);
+						break;
+					case "tx2":
+						portrait_under.setImageResource(R.drawable.tx2);
+						break;
+					case "tx3":
+						portrait_under.setImageResource(R.drawable.tx3);
+						break;
+					case "tx4":
+						portrait_under.setImageResource(R.drawable.tx4);
+						break;
+					case "tx5":
+						portrait_under.setImageResource(R.drawable.tx5);
+						break;
+					case "tx6":
+						portrait_under.setImageResource(R.drawable.tx6);
+						break;
+					case "tx7":
+						portrait_under.setImageResource(R.drawable.tx7);
+						break;
+					case "tx8":
+						portrait_under.setImageResource(R.drawable.tx8);
+						break;
+					default:
+						portrait_under.setImageResource(R.drawable.tx4);
+						break;
+					}
+				}
+				continue;
+			}
+			portrait = cursor.getString(3);
+			name = cursor.getString(1);
+			if (name.equals(current_member_name)) {
+				switch (portrait) {
+				case "tx1":
+					portrait = "xz1";
+					break;
+				case "tx2":
+					portrait = "xz2";
+					break;
+				case "tx3":
+					portrait = "xz3";
+					break;
+				case "tx4":
+					portrait = "xz4";
+					break;
+				case "tx5":
+					portrait = "xz5";
+					break;
+				case "tx6":
+					portrait = "xz6";
+					break;
+				case "tx7":
+					portrait = "xz7";
+					break;
+				case "tx8":
+					portrait = "xz8";
+					break;
+				default:
+					portrait_under.setImageResource(R.drawable.tx4);
+					break;
+				}
+				list.add(new MemberItem(portrait, name));
+			} else {
+				list.add(new MemberItem(portrait, name));
+			}
+			takeDrugPeopleItemAdapter.setArrayList(list);
+			listView.setAdapter(takeDrugPeopleItemAdapter);
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					MemberItem memberItem = (MemberItem) listView
+							.getItemAtPosition(position);
+					String sql1 = "select memberID from MemberInfoTable where name ='"
+							+ memberItem.getName() + "'";
+					db = databaseHelper.getWritableDatabase();
+					Cursor cursor1 = db.rawQuery(sql1, null);
+					while (cursor1.moveToNext()) {
+						current_member_id = cursor1.getString(0);
+					}
+					String sql = "update anonymityRegister set current_member_id ='"
+							+ current_member_id
+							+ "',current_member_portrait ='"
+							+ memberItem.getPortrait()
+							+ "',current_member_name ='"
+							+ memberItem.getName()
+							+ "'";
+					db.execSQL(sql);
+					switch (memberItem.getPortrait()) {
+					case "tx1":
+						memberItem.setPortrait("xz1");
+						break;
+					case "tx2":
+						memberItem.setPortrait("xz2");
+						break;
+					case "tx3":
+						memberItem.setPortrait("xz3");
+						break;
+					case "tx4":
+						memberItem.setPortrait("xz4");
+						break;
+					case "tx5":
+						memberItem.setPortrait("xz5");
+						break;
+					case "tx6":
+						memberItem.setPortrait("xz6");
+						break;
+					case "tx7":
+						memberItem.setPortrait("xz7");
+						break;
+					case "tx8":
+						memberItem.setPortrait("xz8");
+						break;
+					default:
+						memberItem.setPortrait("xz4");
+						break;
+					}
+					takeDrugPeopleItemAdapter.notifyDataSetChanged();
+					listener.onConfirmInterface(memberItem.getPortrait(),
+							memberItem.getName());
+					db.close();
+					dismiss();
+				}
+			});
+			num++;
+		}
+		db.close();
+		// 添加
+		add = (ImageView) rootView.findViewById(R.id.add);
+		add.setOnClickListener(new MyClickAddListener());
+		// 取消按钮监视器
+		cancel = (TextView) rootView.findViewById(R.id.cancel);
+		cancel.setOnClickListener(new MyClickCancelTextViewListener());
+
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	// 点击添加监视器 尼见 2015-03-03
+	class MyClickAddListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			if (flag == 4) {
+				AlertDialog dialog = getAlertDialogWithMemberReachMax();
+				dialog.show();
+
+				return;
+			}
+
+			AddTakeDrugPeopleDialogFragment addTakeDrugPeopleDialogFragment = new AddTakeDrugPeopleDialogFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString("name", current_member_name);
+			addTakeDrugPeopleDialogFragment.setArguments(bundle);
+			addTakeDrugPeopleDialogFragment.show(getFragmentManager(),
+					"addTakeDrugPeopleDialogFragment");
+			dismiss();
+		}
+
+		// 成员数量已达到上限 尼见 2015-03-26
+		AlertDialog getAlertDialogWithMemberReachMax() {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					getActivity(), AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+			builder.setTitle("提示");
+			builder.setMessage("成员数量已达到上限");
+			builder.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+
+						}
+					});
+			builder.setCancelable(false);
+			AlertDialog dialog = builder.create();
+			return dialog;
+		}
+	}
+
+	// 点击取消监视器 尼见 2015-03-03
+	class MyClickCancelTextViewListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			dismiss();
+		}
+	}
+
+	// 选中底部头像监视器监视器 尼见 2015-03-26
+	class MyClickUnderPersonListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 设置点击之后更新数据库中当前服药人
+			db = databaseHelper.getWritableDatabase();
+			String sql1 = "select memberID from MemberInfoTable where name ='"
+					+ name_under.getText().toString() + "'";
+			Cursor cursor1 = db.rawQuery(sql1, null);
+			while (cursor1.moveToNext()) {
+				current_member_id = cursor1.getString(0);
+			}
+			String sql = "update anonymityRegister set current_member_id ='"
+					+ current_member_id + "',current_member_portrait ='"
+					+ portrait_under_flag + "',current_member_name ='"
+					+ name_under.getText().toString() + "'";
+			db.execSQL(sql);
+			db.close();
+
+			switch (portrait_under_flag) {
+			case "tx1":
+				portrait_under.setImageResource(R.drawable.xz1);
+				break;
+			case "tx2":
+				portrait_under.setImageResource(R.drawable.xz2);
+				break;
+			case "tx3":
+				portrait_under.setImageResource(R.drawable.xz3);
+				break;
+			case "tx4":
+				portrait_under.setImageResource(R.drawable.xz4);
+				break;
+			case "tx5":
+				portrait_under.setImageResource(R.drawable.xz5);
+				break;
+			case "tx6":
+				portrait_under.setImageResource(R.drawable.xz6);
+				break;
+			case "tx7":
+				portrait_under.setImageResource(R.drawable.xz7);
+				break;
+			case "tx8":
+				portrait_under.setImageResource(R.drawable.xz8);
+				break;
+			default:
+				portrait_under.setImageResource(R.drawable.xz4);
+				break;
+			}
+			listener.onConfirmInterface(portrait_under_flag, name_under
+					.getText().toString());
+			dismiss();
+		}
+	}
+
+}

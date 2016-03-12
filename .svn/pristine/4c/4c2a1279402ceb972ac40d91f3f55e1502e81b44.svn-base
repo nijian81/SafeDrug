@@ -1,0 +1,136 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+/**
+ * 输入生日对话框
+ */
+
+import android.app.DialogFragment;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.DatePicker;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class InputBirthdayDialogFragment extends DialogFragment {
+
+    ConfirmInterface listener;
+    DatePicker datePicker;
+    TextView cancel, confirm;
+    int year;
+    int month;
+    int day;
+
+    //定制fragmentDialog弹出动作
+    @Override
+    public void onActivityCreated(Bundle arg0) {
+        super.onActivityCreated(arg0);
+        getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+    }
+
+    public static InputBirthdayDialogFragment newInstance(int year, int month, int day) {
+        InputBirthdayDialogFragment frag = new InputBirthdayDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt("year", year);
+        args.putInt("month", month);
+        args.putInt("day", day);
+        frag.setArguments(args);
+        year = frag.getArguments().getInt("year");
+        month = frag.getArguments().getInt("month");
+        day = frag.getArguments().getInt("day");
+        return frag;
+    }
+
+    public interface ConfirmInterface {
+        public void onConfirmInterface(int year, int month, int day);
+    }
+
+    public void setConfirmInterface(ConfirmInterface listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.input_birthday_dialog, container, false);
+
+        year = getArguments().getInt("year", 0);
+        month = getArguments().getInt("month", 0);
+        day = getArguments().getInt("day", 0);
+        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
+        datePicker.updateDate(year, month - 1, day);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        cancel = (TextView) rootView.findViewById(R.id.cancel);
+        cancel.setOnClickListener(new MyClickCancelListener());
+        confirm = (TextView) rootView.findViewById(R.id.confirm);
+        confirm.setOnClickListener(new MyClickConfirmListener());
+        Window window = getDialog().getWindow();
+        window.setGravity(Gravity.BOTTOM);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date curDate = new Date(System.currentTimeMillis());
+        String localTimeStamp = formatter.format(curDate);
+
+        long sixDayLater = System.currentTimeMillis() + 86400000 * 6;
+        Date sixDayLaterDate = new Date(sixDayLater);
+        String sixDayLaterDateTimeStamp = formatter.format(sixDayLaterDate);
+
+        return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    //点击取消监视器 尼见 2015-03-04
+    class MyClickCancelListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            dismiss();
+        }
+    }
+
+    //点击保存监视器 尼见 2015-03-04
+    class MyClickConfirmListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            int year = datePicker.getYear();
+            int month = datePicker.getMonth() + 1;
+            int day = datePicker.getDayOfMonth();
+            listener.onConfirmInterface(year, month, day);
+            dismiss();
+        }
+    }
+
+}

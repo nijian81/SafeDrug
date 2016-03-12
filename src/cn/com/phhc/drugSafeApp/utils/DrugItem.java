@@ -1,0 +1,75 @@
+package cn.com.phhc.drugSafeApp.utils;
+
+//用于药品查询界面列表项展示 尼见 2015-03-09
+public class DrugItem {
+
+    String productDrugId;
+    String drugName;
+    String basicDrugId;
+    String drugDescription;
+    String sortLetters;  //显示数据拼音的首字母
+    String pinyin;
+    String localDrugID;
+
+    public DrugItem(String productDrugId, String drugName, String basicDrugId, String pinyin, String sortLetters) {
+        this.productDrugId = productDrugId;
+        this.drugName = drugName;
+        this.basicDrugId = basicDrugId;
+        this.pinyin = pinyin;
+        this.sortLetters = sortLetters;
+    }
+
+    public DrugItem(String productDrugId, String drugName, String basicDrugId, String sortLetters) {
+        this.productDrugId = productDrugId;
+        this.drugName = drugName;
+        this.basicDrugId = basicDrugId;
+        this.sortLetters = sortLetters;
+    }
+
+    public DrugItem(String productDrugId, String drugName, String basicDrugId,
+			String sortLetters, String pinyin, String drugDescription) {
+		this.productDrugId = productDrugId;
+		this.drugName = drugName;
+		this.basicDrugId = basicDrugId;
+		this.sortLetters = sortLetters;
+		this.pinyin = pinyin;
+		this.drugDescription = drugDescription;
+	}
+    
+    public DrugItem(String drugName) {
+        this.drugName = drugName;
+    }
+
+    public String getProductDrugId() {
+        return productDrugId;
+    }
+
+    public String getDrugName() {
+        return drugName;
+    }
+
+    public String getBasicDrugId() {
+        return basicDrugId;
+    }
+
+    public String getDrugDescription() {
+        return drugDescription;
+    }
+
+    public String getSortLetters() {
+        return sortLetters;
+    }
+
+    public String getPinyin() {
+        return pinyin;
+    }
+
+    public String getLocalDrugID() {
+        return localDrugID;
+    }
+
+    public void setSortLetters(String sortLetters) {
+        this.sortLetters = sortLetters;
+    }
+
+}

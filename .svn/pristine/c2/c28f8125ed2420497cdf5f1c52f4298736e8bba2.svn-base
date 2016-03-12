@@ -1,0 +1,847 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+import java.util.ArrayList;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.PersonalInformation;
+public class RelaxTimeFragment extends Fragment {
+
+	ArrayList<PersonalInformation> list;
+	ModifyMemberInformationFragment modifyMemberInformationFragment;
+	RelativeLayout wakeUp, breakfast, lunch, dinner, sleep;
+	ImageButton back_relax_time;
+	TextView wakeUpTime, breakfastTime, lunchTime, dinnerTime, sleepTime;
+	CompletePersonalInformationFragment completePersonalInformationFragment;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName, wakeUpTime_database, breakfastTime_database,
+			lunchTime_database, dinnerTime_database, sleepTime_database,
+			itemName;
+	int isMyself;
+	Boolean flag1 = false, flag2 = false, flag3 = false, flag4 = false;
+	// 以下的参数用于和数据库做对比，来提示用户是否保存
+	String getupTimeParam = "", breakfastTimeParam = "", lunchTimeParam = "",
+			dinnerTimeParam = "", sleepTimeParam = "";
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.relax_time_fragment,
+				container, false);
+
+		Bundle bundle = this.getArguments();
+		list = new ArrayList<>();
+		// "1"表示自己，“0”表示家庭成员变量
+		isMyself = bundle.getInt("isMyself");
+		itemName = bundle.getString("itemName");
+		// getupTimeParam = bundle.getString("getupTimeParam");
+		// breakfastTimeParam = bundle.getString("breakfastTimeParam");
+		// lunchTimeParam = bundle.getString("lunchTimeParam");
+		// dinnerTimeParam = bundle.getString("dinnerTimeParam");
+		// sleepTimeParam = bundle.getString("sleepTimeParam");
+		list = (ArrayList) bundle
+				.getCharSequenceArrayList("PersonalInformation");
+
+		// 查数据库去初始化有关视图
+		String sql = "select * from MemberInfoTable where name ='" + itemName
+				+ "'";
+		db = databaseHelper.getWritableDatabase();
+		Cursor cursor = db.rawQuery(sql, null);
+		while (cursor.moveToNext()) {
+			wakeUpTime_database = cursor.getString(7);
+			breakfastTime_database = cursor.getString(8);
+			lunchTime_database = cursor.getString(9);
+			dinnerTime_database = cursor.getString(10);
+			sleepTime_database = cursor.getString(11);
+		}
+		db.close();
+		// 根据数据库是否有作息时间，来决定页面的时间展示
+
+		// 返回按钮
+		back_relax_time = (ImageButton) rootView
+				.findViewById(R.id.back_relax_time);
+		back_relax_time
+				.setOnClickListener(new MyClickBackCompletePersonInformationListener());
+		// 保存
+		// save = (TextView) rootView.findViewById(R.id.save);
+		// save.setOnClickListener(new MyClickSaveListener());
+		// 起床
+		wakeUp = (RelativeLayout) rootView.findViewById(R.id.wakeUp);
+		wakeUp.setOnClickListener(new MyClickWakeUpListener());
+		wakeUpTime = (TextView) rootView.findViewById(R.id.wakeUpTime);
+		// wakeUpTime.setText(wakeUpTime_database);
+		// breakfastTime.setText(breakfastTime_database);
+		// lunchTime.setText(lunchTime_database);
+		// dinnerTime.setText(dinnerTime_database);
+		// sleepTime.setText(sleepTime_database);
+		// 早餐
+		breakfast = (RelativeLayout) rootView.findViewById(R.id.breakfast);
+		breakfast.setOnClickListener(new MyClickBreakfastListener());
+		breakfastTime = (TextView) rootView.findViewById(R.id.breakfastTime);
+		// 午餐
+		lunch = (RelativeLayout) rootView.findViewById(R.id.lunch);
+		lunch.setOnClickListener(new MyClickLunchListener());
+		lunchTime = (TextView) rootView.findViewById(R.id.lunchTime);
+		// 晚餐
+		dinner = (RelativeLayout) rootView.findViewById(R.id.dinner);
+		dinner.setOnClickListener(new MyClickDinnerListener());
+		dinnerTime = (TextView) rootView.findViewById(R.id.dinnerTime);
+		// 睡觉
+		sleep = (RelativeLayout) rootView.findViewById(R.id.sleep);
+		sleep.setOnClickListener(new MyClickSleepListener());
+		sleepTime = (TextView) rootView.findViewById(R.id.sleepTime);
+		// 如果传过来的实体里面有值的话，就初始化视图
+		if (list.get(0).getGetupTime().length() != 0) {
+			wakeUpTime.setText(list.get(0).getGetupTime());
+			breakfastTime.setText(list.get(0).getBreakfastTime());
+			lunchTime.setText(list.get(0).getLunchTime());
+			dinnerTime.setText(list.get(0).getDinnerTime());
+			sleepTime.setText(list.get(0).getSleepTime());
+		} else {
+			wakeUpTime_database = "07:00";
+			breakfastTime_database = "07:30";
+			lunchTime_database = "12:00";
+			dinnerTime_database = "18:00";
+			sleepTime_database = "22:00";
+			list.get(0).setGetupTime("07:00");
+			list.get(0).setBreakfastTime("07:30");
+			list.get(0).setLunchTime("12:00");
+			list.get(0).setDinnerTime("18:00");
+			list.get(0).setSleepTime("22:00");
+		}
+		return rootView;
+	}
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
+
+	// 返回监视器 尼见 2015-03-04
+	class MyClickBackCompletePersonInformationListener implements
+			View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 判断早餐时间是否大于起床时间
+			if (wakeUpTime_database.compareTo(breakfastTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithBreakfastTimeBiggerThanWakeupTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断午餐时间是否大于早餐时间
+			if (breakfastTime_database.compareTo(lunchTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithLunchTimeBiggerThanBreakfastTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断晚餐时间是否大于午餐时间
+			if (lunchTime_database.compareTo(dinnerTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithDinnerTimeBiggerThanLunchTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断睡觉时间是否大于晚餐时间
+			if (dinnerTime_database.compareTo(sleepTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithSleepTimeBiggerDinnerTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断作息时间是否规律
+			String a[] = wakeUpTime_database.split(":");
+			int hour1 = Integer.parseInt(a[0]);
+			int minute1 = Integer.parseInt(a[1]);
+			int num1 = hour1 * 100 + minute1;
+			String b[] = breakfastTime_database.split(":");
+			int hour2 = Integer.parseInt(b[0]);
+			int minute2 = Integer.parseInt(b[1]);
+			int num2 = hour2 * 100 + minute2;
+			String c[] = lunchTime_database.split(":");
+			int hour3 = Integer.parseInt(c[0]);
+			int minute3 = Integer.parseInt(c[1]);
+			int num3 = hour3 * 100 + minute3;
+			String d[] = dinnerTime_database.split(":");
+			int hour4 = Integer.parseInt(d[0]);
+			int minute4 = Integer.parseInt(d[1]);
+			int num4 = hour4 * 100 + minute4;
+			String e[] = sleepTime_database.split(":");
+			int hour5 = Integer.parseInt(e[0]);
+			int minute5 = Integer.parseInt(e[1]);
+			int num5 = hour5 * 100 + minute5;
+			int result1 = num2 - num1;
+			int result2 = num3 - num2;
+			int result3 = num4 - num3;
+			int result4 = num5 - num4;
+
+			if (result1 >= 15 && result1 <= 200) {
+				flag1 = true;
+			}
+
+			if (result2 >= 300 && result2 <= 600) {
+				flag2 = true;
+			}
+
+			if (result3 >= 400 && result3 <= 800) {
+				flag3 = true;
+			}
+
+			if (result4 >= 200) {
+				flag4 = true;
+			}
+			if (flag1 && flag2 && flag3 && flag4) {
+
+				// 作息时间符合规律，直接返回。
+				if (isMyself == 1) {
+					FragmentManager fragmentManager = getActivity()
+							.getSupportFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager
+							.beginTransaction();
+					completePersonalInformationFragment = new CompletePersonalInformationFragment();
+					Bundle bundle = new Bundle();
+					// 设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+					bundle.putInt("isMyself", 1);
+					bundle.putCharSequenceArrayList("PersonalInformation",
+							(ArrayList) list);
+					completePersonalInformationFragment.setArguments(bundle);
+					fragmentTransaction.setCustomAnimations(
+							R.anim.enter_from_left, R.anim.exit_to_right);
+					fragmentTransaction.replace(R.id.login_fragment,
+							completePersonalInformationFragment,
+							"completePersonalInformationFragment");
+					fragmentTransaction.addToBackStack(null);
+					fragmentTransaction.commit();
+				} else {
+					FragmentManager fragmentManager = getActivity()
+							.getSupportFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager
+							.beginTransaction();
+					modifyMemberInformationFragment = new ModifyMemberInformationFragment();
+					Bundle bundle = new Bundle();
+					// 设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+					bundle.putString("name", itemName);
+					bundle.putCharSequenceArrayList("PersonalInformation",
+							(ArrayList) list);
+					modifyMemberInformationFragment.setArguments(bundle);
+					fragmentTransaction.setCustomAnimations(
+							R.anim.enter_from_left, R.anim.exit_to_right);
+					fragmentTransaction.replace(R.id.login_fragment,
+							modifyMemberInformationFragment,
+							"modifyMemberInformationFragment");
+					fragmentTransaction.addToBackStack(null);
+					fragmentTransaction.commit();
+				}
+			} else {
+				flag1 = false;
+				flag2 = false;
+				flag3 = false;
+				flag4 = false;
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithUseDefaultOrSave();
+						dialog.show();
+					}
+				});
+			}
+
+		}
+	}
+
+	// 点击保存作息时间监视器 尼见 2015-03-04
+	class MyClickSaveListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 判断早餐时间是否大于起床时间
+			if (wakeUpTime_database.compareTo(breakfastTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithBreakfastTimeBiggerThanWakeupTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断午餐时间是否大于早餐时间
+			if (breakfastTime_database.compareTo(lunchTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithLunchTimeBiggerThanBreakfastTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断晚餐时间是否大于午餐时间
+			if (lunchTime_database.compareTo(dinnerTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithDinnerTimeBiggerThanLunchTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断睡觉时间是否大于晚餐时间
+			if (dinnerTime_database.compareTo(sleepTime_database) >= 1) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithSleepTimeBiggerDinnerTime();
+						dialog.show();
+					}
+				});
+				return;
+			}
+
+			// 判断作息时间是否规律
+			String a[] = wakeUpTime_database.split(":");
+			int hour1 = Integer.parseInt(a[0]);
+			int minute1 = Integer.parseInt(a[1]);
+			int num1 = hour1 * 100 + minute1;
+			String b[] = breakfastTime_database.split(":");
+			int hour2 = Integer.parseInt(b[0]);
+			int minute2 = Integer.parseInt(b[1]);
+			int num2 = hour2 * 100 + minute2;
+			String c[] = lunchTime_database.split(":");
+			int hour3 = Integer.parseInt(c[0]);
+			int minute3 = Integer.parseInt(c[1]);
+			int num3 = hour3 * 100 + minute3;
+			String d[] = dinnerTime_database.split(":");
+			int hour4 = Integer.parseInt(d[0]);
+			int minute4 = Integer.parseInt(d[1]);
+			int num4 = hour4 * 100 + minute4;
+			String e[] = sleepTime_database.split(":");
+			int hour5 = Integer.parseInt(e[0]);
+			int minute5 = Integer.parseInt(e[1]);
+			int num5 = hour5 * 100 + minute5;
+			int result1 = num2 - num1;
+			int result2 = num3 - num2;
+			int result3 = num4 - num3;
+			int result4 = num5 - num4;
+
+			if (result1 >= 15 && result1 <= 200) {
+				flag1 = true;
+			}
+
+			if (result2 >= 300 && result2 <= 600) {
+				flag2 = true;
+			}
+
+			if (result3 >= 400 && result3 <= 800) {
+				flag3 = true;
+			}
+
+			if (result4 >= 200) {
+				flag4 = true;
+			}
+			if (flag1 && flag2 && flag3 && flag4) {
+				db = databaseHelper.getWritableDatabase();
+				String sql = "update MemberInfoTable set getup ='"
+						+ wakeUpTime_database + "' , breakfast ='"
+						+ breakfastTime_database + "' , lunch ='"
+						+ lunchTime_database + "' , dinner ='"
+						+ dinnerTime_database + "' , sleep ='"
+						+ sleepTime_database + "' where name ='" + itemName
+						+ "'";
+				db.execSQL(sql);
+				db.close();
+				flag1 = false;
+				flag2 = false;
+				flag3 = false;
+				flag4 = false;
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithSaveSuccess();
+						dialog.show();
+					}
+				});
+			} else {
+				flag1 = false;
+				flag2 = false;
+				flag3 = false;
+				flag4 = false;
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithUseDefaultOrSave();
+						dialog.show();
+					}
+				});
+			}
+		}
+	}
+
+	// 保存作息时间成功提示 尼见 2015-03-04
+	AlertDialog getAlertDialogWithSaveSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("保存用户作息时间成功");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 使用默认时间或者仍然保存 尼见 2015-03-12
+	AlertDialog getAlertDialogWithUseDefaultOrSave() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setMessage("作息时间不规律，建议使用默认设置");
+		builder.setPositiveButton("继续保存",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// 作息时间符合规律，直接返回。
+						if (isMyself == 1) {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							completePersonalInformationFragment = new CompletePersonalInformationFragment();
+							Bundle bundle = new Bundle();
+							// 设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+							bundle.putInt("isMyself", 1);
+							bundle.putCharSequenceArrayList(
+									"PersonalInformation", (ArrayList) list);
+							completePersonalInformationFragment
+									.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									completePersonalInformationFragment,
+									"completePersonalInformationFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						} else {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							modifyMemberInformationFragment = new ModifyMemberInformationFragment();
+							Bundle bundle = new Bundle();
+							// 设置标志位，isMyself为0表示添加成员信息，isMyself为1表示修改本人信息。
+							bundle.putString("name", itemName);
+							bundle.putCharSequenceArrayList(
+									"PersonalInformation", (ArrayList) list);
+							modifyMemberInformationFragment
+									.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									modifyMemberInformationFragment,
+									"modifyMemberInformationFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						}
+					}
+				});
+		builder.setNegativeButton("使用默认",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						wakeUpTime.setText("07:00");
+						breakfastTime.setText("07:30");
+						lunchTime.setText("12:00");
+						dinnerTime.setText("18:00");
+						sleepTime.setText("22:00");
+						wakeUpTime_database = "07:00";
+						breakfastTime_database = "07:30";
+						lunchTime_database = "12:00";
+						dinnerTime_database = "18:00";
+						sleepTime_database = "22:00";
+					}
+				});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 早餐时间不能早于起床时间 尼见 2015-03-11
+	AlertDialog getAlertDialogWithBreakfastTimeBiggerThanWakeupTime() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("早餐时间不能早于起床时间");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 午餐时间不能早于早餐时间 尼见 2015-03-11
+	AlertDialog getAlertDialogWithLunchTimeBiggerThanBreakfastTime() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("午餐时间不能早于早餐时间");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 晚餐时间不能早于午餐时间 尼见 2015-03-11
+	AlertDialog getAlertDialogWithDinnerTimeBiggerThanLunchTime() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("晚餐时间不能早于午餐时间");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 睡觉时间不能早于晚餐时间 尼见 2015-03-11
+	AlertDialog getAlertDialogWithSleepTimeBiggerDinnerTime() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("睡觉时间不能早于晚餐时间");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+
+	}
+
+	// 点击起床监视器 尼见 2015-03-04
+	class MyClickWakeUpListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputRelaxTimeFragment inputRelaxTimeFragment = InputRelaxTimeFragment
+					.newInstance(01, 01);
+			inputRelaxTimeFragment
+					.setConfirmInterface(new InputRelaxTimeFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int hour, int minute) {
+							String minute_show = "00";
+							String hour_show = "00";
+							if (minute <= 9) {
+								minute_show = "0" + minute;
+							} else {
+								minute_show = Integer.toString(minute);
+							}
+							if (hour <= 9) {
+								hour_show = "0" + hour;
+							} else {
+								hour_show = Integer.toString(hour);
+							}
+							wakeUpTime.setText(hour_show + ":" + minute_show);
+							wakeUpTime_database = hour_show + ":" + minute_show;
+							list.get(0).setGetupTime(wakeUpTime_database);
+						}
+					});
+			if (wakeUpTime_database.length() == 0) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", 07);
+				bundle.putInt("minute", 00);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			} else {
+				String time[] = wakeUpTime_database.split(":");
+				int hour = Integer.parseInt(time[0]);
+				int minute = Integer.parseInt(time[1]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", hour);
+				bundle.putInt("minute", minute);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+	// 点击早餐监视器 尼见 2015-03-04
+	class MyClickBreakfastListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputRelaxTimeFragment inputRelaxTimeFragment = InputRelaxTimeFragment
+					.newInstance(01, 01);
+			inputRelaxTimeFragment
+					.setConfirmInterface(new InputRelaxTimeFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int hour, int minute) {
+							String minute_show = "00";
+							String hour_show = "00";
+							if (minute <= 9) {
+								minute_show = "0" + minute;
+							} else {
+								minute_show = Integer.toString(minute);
+							}
+							if (hour <= 9) {
+								hour_show = "0" + hour;
+							} else {
+								hour_show = Integer.toString(hour);
+							}
+							breakfastTime
+									.setText(hour_show + ":" + minute_show);
+							breakfastTime_database = hour_show + ":"
+									+ minute_show;
+							list.get(0)
+									.setBreakfastTime(breakfastTime_database);
+						}
+					});
+			if (breakfastTime_database.length() == 0) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", 07);
+				bundle.putInt("minute", 30);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			} else {
+				String time[] = breakfastTime_database.split(":");
+				int hour = Integer.parseInt(time[0]);
+				int minute = Integer.parseInt(time[1]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", hour);
+				bundle.putInt("minute", minute);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			}
+
+		}
+	}
+
+	// 点击午餐监视器 尼见 2015-03-04
+	class MyClickLunchListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputRelaxTimeFragment inputRelaxTimeFragment = InputRelaxTimeFragment
+					.newInstance(01, 01);
+			inputRelaxTimeFragment
+					.setConfirmInterface(new InputRelaxTimeFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int hour, int minute) {
+							String minute_show = "00";
+							String hour_show = "00";
+							if (minute <= 9) {
+								minute_show = "0" + minute;
+							} else {
+								minute_show = Integer.toString(minute);
+							}
+							if (hour <= 9) {
+								hour_show = "0" + hour;
+							} else {
+								hour_show = Integer.toString(hour);
+							}
+							lunchTime.setText(hour_show + ":" + minute_show);
+							lunchTime_database = hour_show + ":" + minute_show;
+							list.get(0).setLunchTime(lunchTime_database);
+						}
+					});
+			if (lunchTime.length() == 0) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", 12);
+				bundle.putInt("minute", 00);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			} else {
+				String time[] = lunchTime_database.split(":");
+				int hour = Integer.parseInt(time[0]);
+				int minute = Integer.parseInt(time[1]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", hour);
+				bundle.putInt("minute", minute);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+	// 点击晚餐监视器 尼见 2015-03-04
+	class MyClickDinnerListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputRelaxTimeFragment inputRelaxTimeFragment = InputRelaxTimeFragment
+					.newInstance(01, 01);
+			inputRelaxTimeFragment
+					.setConfirmInterface(new InputRelaxTimeFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int hour, int minute) {
+							String minute_show = "00";
+							String hour_show = "00";
+							if (minute <= 9) {
+								minute_show = "0" + minute;
+							} else {
+								minute_show = Integer.toString(minute);
+							}
+							if (hour <= 9) {
+								hour_show = "0" + hour;
+							} else {
+								hour_show = Integer.toString(hour);
+							}
+							dinnerTime.setText(hour_show + ":" + minute_show);
+							dinnerTime_database = hour_show + ":" + minute_show;
+							list.get(0).setDinnerTime(dinnerTime_database);
+						}
+					});
+			if (dinnerTime_database.length() == 0) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", 18);
+				bundle.putInt("minute", 00);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			} else {
+				String time[] = dinnerTime_database.split(":");
+				int hour = Integer.parseInt(time[0]);
+				int minute = Integer.parseInt(time[1]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", hour);
+				bundle.putInt("minute", minute);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+	// 点击睡觉监视器 尼见 2015-03-04
+	class MyClickSleepListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputRelaxTimeFragment inputRelaxTimeFragment = InputRelaxTimeFragment
+					.newInstance(01, 01);
+			inputRelaxTimeFragment
+					.setConfirmInterface(new InputRelaxTimeFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int hour, int minute) {
+							String minute_show = "00";
+							String hour_show = "00";
+							if (minute <= 9) {
+								minute_show = "0" + minute;
+							} else {
+								minute_show = Integer.toString(minute);
+							}
+							if (hour <= 9) {
+								hour_show = "0" + hour;
+							} else {
+								hour_show = Integer.toString(hour);
+							}
+							sleepTime.setText(hour_show + ":" + minute_show);
+							sleepTime_database = hour_show + ":" + minute_show;
+							list.get(0).setSleepTime(sleepTime_database);
+						}
+					});
+			if (sleepTime_database.length() == 0) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", 22);
+				bundle.putInt("minute", 00);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			} else {
+				String time[] = sleepTime_database.split(":");
+				int hour = Integer.parseInt(time[0]);
+				int minute = Integer.parseInt(time[1]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("hour", hour);
+				bundle.putInt("minute", minute);
+				inputRelaxTimeFragment.setArguments(bundle);
+				inputRelaxTimeFragment.show(getActivity().getFragmentManager(),
+						"inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+}

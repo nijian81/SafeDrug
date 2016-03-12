@@ -1,0 +1,126 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+
+import android.R.integer;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import cn.com.phhc.drugSafeApp.R;
+
+public class AboutUsFragment extends Fragment {
+
+    CompanyIntroduceFragment companyIntroduceFragment;
+    FunctionIntroduceFragment functionIntroduceFragment;
+    UsingProtocolFragment usingProtocolFragment;
+    RelativeLayout companyIntroduce,usingProtocol,functionIntroduce,welcomePage;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.about_us_fragment,
+                container, false);
+        companyIntroduce = (RelativeLayout)rootView.findViewById(R.id.companyIntroduce);
+        companyIntroduce.setOnClickListener(new MyClickCompanyIntroduceListener());
+        usingProtocol = (RelativeLayout)rootView.findViewById(R.id.usingProtocol);
+        usingProtocol.setOnClickListener(new MyClickUsingProtocolListener());
+        functionIntroduce = (RelativeLayout)rootView.findViewById(R.id.functionIntroduce);
+        functionIntroduce.setOnClickListener(new MyClickFunctionIntroduceListener());
+        welcomePage = (RelativeLayout)rootView.findViewById(R.id.welcomePage);
+        welcomePage.setOnClickListener(new MyClickWelcomePageListener());
+        return rootView;
+
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+    //加载公司介绍fragment 尼见 2015-02-28
+    class MyClickCompanyIntroduceListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            companyIntroduceFragment = new CompanyIntroduceFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, companyIntroduceFragment, "companyIntroduceFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+
+    }
+
+    //加载用户协议fragment 尼见 2015-02-28
+    class MyClickUsingProtocolListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            usingProtocolFragment = new UsingProtocolFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, usingProtocolFragment, "usingProtocolFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //加载功能介绍fragment 尼见 2015-02-28
+    class MyClickFunctionIntroduceListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            functionIntroduceFragment = new FunctionIntroduceFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+            fragmentTransaction.replace(R.id.login_fragment, functionIntroduceFragment, "functionIntroduceFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+    //加载欢迎页fragment 尼见 2015-02-28
+    class MyClickWelcomePageListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+           Intent intent = new Intent();
+           intent.setAction("android.intent.action.WELCOME");
+           startActivity(intent);
+        }
+    }
+
+}

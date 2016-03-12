@@ -1,0 +1,119 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import cn.com.phhc.drugSafeApp.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class WelcomePageFragment extends Fragment  {
+
+    AboutUsFragment aboutUsFragment;
+    ImageView jumpIntoAboutUs;
+    LinearLayout linearLayoutTab;
+    private ViewPager vp;
+    private cn.com.phhc.drugSafeApp.utils.ViewPagerAdapter vpAdapter;
+    private List<View> views;
+
+    // 底部小点图片
+    private ImageView[] dots;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.welcome_page_fragment,
+                container, false);
+
+        //隐藏起始界面的四个button按钮
+        linearLayoutTab = (LinearLayout) getActivity().findViewById(R.id.tab);
+        linearLayoutTab.setVisibility(View.GONE);
+        views = new ArrayList<View>();
+        // 初始化引导图片列表
+        views.add(inflater.inflate(R.layout.welcome1, null));
+        views.add(inflater.inflate(R.layout.welcome2, null));
+        views.add(inflater.inflate(R.layout.welcome3, null));
+        views.add(inflater.inflate(R.layout.welcome4, null));
+        views.add(inflater.inflate(R.layout.welcome5, null));
+        jumpIntoAboutUs = (ImageView) views.get(4).findViewById(R.id.jumpIntoAboutUs);
+        jumpIntoAboutUs.setOnClickListener(new MyClickJumpIntoAboutUsListener());
+        // 初始化Adapter
+        vpAdapter = new cn.com.phhc.drugSafeApp.utils.ViewPagerAdapter(views, getActivity());
+        vp = (ViewPager) rootView.findViewById(R.id.welcomePageViewPaper);
+        vp.setAdapter(vpAdapter);
+        //设置页面切换监视器
+        vp.setOnPageChangeListener(new SwitchPageChangeListener());
+        dots = new ImageView[views.size()];
+        dots[0] = (ImageView) rootView.findViewById(R.id.one);
+        dots[1] = (ImageView) rootView.findViewById(R.id.two);
+        dots[2] = (ImageView) rootView.findViewById(R.id.three);
+        dots[3] = (ImageView) rootView.findViewById(R.id.four);
+        dots[4] = (ImageView) rootView.findViewById(R.id.five);
+
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    // 指引页面更改事件监听器，设置圆点滑动时的背景变化。
+    class SwitchPageChangeListener implements ViewPager.OnPageChangeListener {
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+        }
+
+        @Override
+        public void onPageSelected(int arg0) {
+            for (int i = 0; i < dots.length; i++) {
+                dots[arg0].setImageResource(R.drawable.dot_green);
+                if (arg0 != i) {
+                    dots[i].setImageResource(R.drawable.dot_gray);
+                }
+            }
+        }
+    }
+
+    //欢迎页中点击开始安全用药之旅按钮的监听事件 尼见 2015-02-26
+    class MyClickJumpIntoAboutUsListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            linearLayoutTab.setVisibility(View.VISIBLE);
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
+            aboutUsFragment = new AboutUsFragment();
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_up, R.anim.exit_to_down);
+            fragmentTransaction.replace(R.id.login_fragment, aboutUsFragment, "aboutUsFragment");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
+    }
+
+}
+
+

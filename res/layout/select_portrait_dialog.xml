@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/xmlWhiteLineColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_height="50dp"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/xmlDialogTextSize"
+            android:layout_marginLeft="@dimen/xmlDialogTextMargin"
+            android:layout_alignParentLeft="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="取消" />
+
+        <TextView
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/pleaseSelectPortrait"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/xmlDialogTextSize" />
+
+        <TextView
+            android:id="@+id/confirm"
+            android:textColor="@color/xmlDialogGreenTextColor"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/xmlDialogTextMargin"
+            android:layout_alignParentRight="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/xmlDialogTextSize"
+            android:text="确认" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="#000000" />
+
+    <RelativeLayout
+        android:layout_height="70dp"
+        android:layout_width="match_parent"
+        android:layout_margin="15dp">
+
+        <ImageView
+            android:id="@+id/tx1"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:src="@drawable/tx1"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin" />
+
+        <ImageView
+            android:id="@+id/tx2"
+            android:layout_toRightOf="@+id/tx1"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:src="@drawable/tx2" />
+
+        <ImageView
+            android:id="@+id/tx3"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:layout_toRightOf="@+id/tx2"
+            android:src="@drawable/tx3" />
+
+        <ImageView
+            android:id="@+id/tx4"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:layout_toRightOf="@id/tx3"
+            android:src="@drawable/xz4" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="70dp"
+        android:layout_width="match_parent"
+        android:layout_margin="15dp">
+
+        <ImageView
+            android:id="@+id/tx5"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:src="@drawable/tx5"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin" />
+
+        <ImageView
+            android:id="@+id/tx6"
+            android:layout_toRightOf="@+id/tx5"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:src="@drawable/tx6" />
+
+        <ImageView
+            android:id="@+id/tx7"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:layout_toRightOf="@+id/tx6"
+            android:src="@drawable/tx7" />
+
+        <ImageView
+            android:id="@+id/tx8"
+            android:layout_margin="@dimen/xmlDialogPortraitSelectMargin"
+            android:layout_height="@dimen/xmlPortraitHeight"
+            android:layout_width="@dimen/xmlPortraitWidth"
+            android:layout_toRightOf="@id/tx7"
+            android:src="@drawable/tx8" />
+    </RelativeLayout>
+</LinearLayout>

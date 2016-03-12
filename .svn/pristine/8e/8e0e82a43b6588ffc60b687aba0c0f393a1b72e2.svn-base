@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bj"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:background="@color/xmlTopTitleBackgroundColor" >
+
+        <TextView
+            android:id="@+id/currentPeople"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:layout_centerInParent="true"
+            android:drawableRight="@drawable/head_name_image"
+            android:drawableTop="@drawable/tx4"
+            android:gravity="center"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            android:text="@string/myself"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="10sp" />
+
+        <ImageView
+            android:id="@+id/addDrug"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:src="@drawable/tjyp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@color/xmlMiddleContentBackgroundColor" >
+
+        <ImageView
+            android:id="@+id/beforeDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="40dp"
+            android:layout_toLeftOf="@+id/date"
+            android:src="@drawable/syt" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:drawablePadding="20dp"
+            android:text="2015-03-10"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/nextDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="40dp"
+            android:layout_toRightOf="@+id/date"
+            android:src="@drawable/xyt" />
+    </RelativeLayout>
+   
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="350dp" >
+        
+         <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" >
+		
+            
+             <ImageView
+	              android:id="@+id/dayuan"
+	              android:layout_width="match_parent"
+	              android:layout_height="wrap_content"
+	              android:layout_gravity="center"
+	              android:src="@drawable/dayuan" />
+            
+            <com.anupcowkur.wheelmenu.WheelMenu
+                android:id="@+id/dayuanhuan"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center">       
+            </com.anupcowkur.wheelmenu.WheelMenu>
+            
+             <cn.com.phhc.drugSafeApp.view.DataTextView5
+                android:layout_width="59dp"
+                android:layout_height="52.5dp"
+                android:layout_marginRight="64dp"
+               	android:layout_gravity="top|center_horizontal"
+                android:text="02:00" />
+            
+            <cn.com.phhc.drugSafeApp.view.DataTextView6
+                android:layout_width="36dp"
+                android:layout_height="38dp"
+                android:layout_marginRight="89dp"
+                android:layout_marginBottom="117dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="03:00" />
+            
+             <cn.com.phhc.drugSafeApp.view.DataTextView7
+                android:layout_width="36dp"
+                android:layout_height="33dp"
+                android:layout_marginRight="87dp"
+                android:layout_marginBottom="66dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="04:00" />
+
+             
+              <cn.com.phhc.drugSafeApp.view.DataTextView8
+                android:layout_width="38dp"
+                android:layout_height="29dp"
+                android:layout_marginRight="53dp"
+                android:layout_marginBottom="25dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="05:00" />
+
+          <TextView
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="bottom|center_horizontal"
+	          android:layout_marginBottom="13dp"
+	          android:text="06:00" />
+	
+            <cn.com.phhc.drugSafeApp.view.DataTextView
+                android:layout_width="35dp"
+                android:layout_height="55dp"
+                android:layout_marginLeft="52dp"
+                android:layout_marginTop="160dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="07:00" />
+            
+            <cn.com.phhc.drugSafeApp.view.DataTextView1
+                android:layout_width="35dp"
+                android:layout_height="42dp"
+                android:layout_marginLeft="85dp"
+                android:layout_marginBottom="56dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="08:00" />
+            
+             <cn.com.phhc.drugSafeApp.view.DataTextView2
+                android:layout_width="40dp"
+                android:layout_height="69dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginBottom="104dp"
+               	android:layout_gravity="bottom|center_horizontal"
+                android:text="09:00" />
+            
+             <cn.com.phhc.drugSafeApp.view.DataTextView3
+                android:layout_width="47dp"
+                android:layout_height="52dp"
+                android:layout_marginLeft="50dp"
+               	android:layout_gravity="top|center_horizontal"
+                android:text="10:00" />
+             
+            <TextView
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="top|center_horizontal"
+	          android:layout_marginTop="11dp"
+	          android:text="12:00" />
+
+
+            <LinearLayout
+                android:id="@+id/logo_lay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone" >
+
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/logo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/logo_hint"
+                    android:textColor="#7E7C7C"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drug_lay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible" >
+
+                <cn.com.phhc.drugSafeApp.view.CustomNumberPicker
+                    android:id="@+id/drug_name"
+                    android:layout_width="117dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/drug_total_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="45dp"
+                android:text="当前第1/1种"
+                android:textSize="10sp" />
+
+            <ImageView
+                android:id="@+id/sanjiao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="38dp"
+                android:src="@drawable/sanjiao" />
+        </FrameLayout>
+    </RelativeLayout>
+
+</LinearLayout>

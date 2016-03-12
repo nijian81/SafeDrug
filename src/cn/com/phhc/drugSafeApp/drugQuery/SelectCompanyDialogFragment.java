@@ -1,0 +1,182 @@
+package cn.com.phhc.drugSafeApp.drugQuery;
+
+/**
+ * 点击药品详情页面的选择更多按钮，弹出的该药品对应的公司dialogFragment
+ */
+import android.app.DialogFragment;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CompanyItem;
+import cn.com.phhc.drugSafeApp.utils.CompanyItemAdapter;
+import cn.com.phhc.drugSafeApp.utils.CompanyItemDescAdapter;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+import java.util.ArrayList;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class SelectCompanyDialogFragment extends DialogFragment {
+
+	ConfirmInterface listener;
+	ArrayList<CompanyItem> list;
+	CompanyItemAdapter companyItemAdapter;
+	CompanyItemDescAdapter companyItemDescAdapter;
+	ListView listViewCompany;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName, productDrugId, basicDrugId, productName = "",
+			showName, drugSpecifications, factory, productDrugIdInterface,
+			basicDrugIdInterface, drugName, productIdParam;
+
+	// 定制fragmentDialog弹出动作
+	@Override
+	public void onActivityCreated(Bundle arg0) {
+		super.onActivityCreated(arg0);
+		getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+	}
+
+	public static SelectCompanyDialogFragment newInstance(int title) {
+		SelectCompanyDialogFragment frag = new SelectCompanyDialogFragment();
+		Bundle args = new Bundle();
+		args.putString("patient", "2");
+		frag.setArguments(args);
+		return frag;
+	}
+
+	public interface ConfirmInterface {
+		public void onConfirmInterface(String productId, String basicDrugID,
+				String drugName);
+	}
+
+	public void setConfirmInterface(ConfirmInterface listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "drug_info";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.select_company_dialog,
+				container, false);
+
+		getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+		Window window = getDialog().getWindow();
+		window.setGravity(Gravity.BOTTOM);
+		// 显示公司的listView
+		listViewCompany = (ListView) rootView.findViewById(R.id.company);
+		// 设置点击监视器
+		listViewCompany
+				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+					@Override
+					public void onItemClick(AdapterView<?> listView, View view,
+							int position, long id) {
+						CompanyItem companyItem = (CompanyItem) listView
+								.getItemAtPosition(position);
+						listener.onConfirmInterface(list.get(position)
+								.getProductDrugId(), list.get(position)
+								.getBasicDrugId(), list.get(position).getName());
+						dismiss();
+					}
+
+				});
+		getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+		productDrugId = getArguments().getString("productDrugId");
+		productIdParam = productDrugId;
+		basicDrugId = getArguments().getString("basicDrugId");
+		drugName = getArguments().getString("drugName");
+		String sql = "select productName, showName from drugSearchTable where productDrugID = '"
+				+ productDrugId + "' and basicDrugID = '" + basicDrugId + "'";
+		db = databaseHelper.getReadableDatabase();
+		Cursor cursor = db.rawQuery(sql, null);
+		list = new ArrayList<CompanyItem>();
+		while (cursor.moveToNext()) {
+			productName = cursor.getString(0);
+			showName = cursor.getString(1);
+		}
+		if (productName.length() == 0) {
+			String sql2 = "select drugSpecifications, factory, productDrugID, showName, basicDrugID from drugSearchTable where showName ='"
+					+ showName + "' group by factory, drugSpecifications";
+			Cursor cursor2 = db.rawQuery(sql2, null);
+			while (cursor2.moveToNext()) {
+				drugSpecifications = cursor2.getString(0);
+				factory = cursor2.getString(1);
+				productDrugId = cursor2.getString(2);
+				showName = cursor2.getString(3);
+				basicDrugId = cursor2.getString(4);
+				if (productDrugId.equals(productIdParam)) {
+					list.add(new CompanyItem(showName, factory,
+							drugSpecifications, basicDrugId, productDrugId, 1));
+				} else {
+					list.add(new CompanyItem(showName, factory,
+							drugSpecifications, basicDrugId, productDrugId, 0));
+				}
+				companyItemAdapter = new CompanyItemAdapter();
+				companyItemAdapter.setContext(getActivity());
+				companyItemAdapter.setArrayList(list);
+				listViewCompany.setAdapter(companyItemAdapter);
+			}
+		} else {
+			String sql2 = "select drugSpecifications, factory, productDrugID, showName, basicDrugID from drugSearchTable where showName ='"
+					+ showName + "' group by drugSpecifications";
+			Cursor cursor2 = db.rawQuery(sql2, null);
+			while (cursor2.moveToNext()) {
+				drugSpecifications = cursor2.getString(0);
+				factory = cursor2.getString(1);
+				productDrugId = cursor2.getString(2);
+				showName = cursor2.getString(3);
+				basicDrugId = cursor2.getString(4);
+				if (productDrugId.equals(productIdParam)) {
+					list.add(new CompanyItem(showName, factory,
+							drugSpecifications, basicDrugId, productDrugId, 1));
+				} else {
+					list.add(new CompanyItem(showName, factory,
+							drugSpecifications, basicDrugId, productDrugId, 0));
+				}
+				companyItemDescAdapter = new CompanyItemDescAdapter();
+				companyItemDescAdapter.setContext(getActivity());
+				companyItemDescAdapter.setArrayList(list);
+				listViewCompany.setAdapter(companyItemDescAdapter);
+			}
+		}
+		db.close();
+
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+}

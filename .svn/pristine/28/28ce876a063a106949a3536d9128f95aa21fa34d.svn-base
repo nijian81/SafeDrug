@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/tips"
+            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/pleaseInputEightChineseOrSixteenEnglishCharacterWithinHoneyName"
+            android:layout_centerHorizontal="true" />
+
+        <EditText
+            android:id="@+id/input_honey_name"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/tips"
+            android:layout_marginLeft="50dp"
+            android:selectAllOnFocus="true"
+            android:layout_marginBottom="8dp"
+            android:textCursorDrawable="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="20dp"
+            android:background="@null"
+            android:cursorVisible="true"
+            android:hint="@string/pleaseInputHoneyName" />
+
+        <View
+            android:id="@+id/line"
+            android:layout_below="@+id/input_honey_name"
+            android:layout_height="1dp"
+            android:layout_width="wrap_content"
+            android:background="@color/xmlGrayLineColor" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_marginLeft="40dp"
+            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/corners_honey_name"
+            android:text="@string/cancel"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="15dp" />
+
+        <Button
+            android:id="@+id/save"
+            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/corners_honey_name"
+            android:text="@string/save"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="15dp" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,52 @@
+package cn.com.phhc.drugSafeApp.drugQuery;
+
+/**
+ * 二维码扫描页面
+ */
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
+import cn.com.phhc.drugSafeApp.R;
+
+public class BarcodeScannerActivity extends FragmentActivity  {
+
+    ImageView back_drug_query;
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.barcode_scanner);
+        back_drug_query = (ImageView) findViewById(R.id.back_drug_query);
+        back_drug_query.setOnClickListener(new MyClickBackDrugQueryListener());
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+
+
+    class MyClickBackDrugQueryListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+        }
+    }
+}

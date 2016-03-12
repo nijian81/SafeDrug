@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <ImageButton
+            android:id="@+id/back_about_us"
+            android:layout_height="@dimen/xmlTopLeftIconHeight"
+            android:layout_width="@dimen/xmlTopLeftIconWidth"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/xmlTopLeftIconMargin"
+            android:scaleType="centerInside"
+            android:onClick="login"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/fanhui" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:text="@string/aboutUs"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="@dimen/xmlTopTitleTextSize" />
+
+    </RelativeLayout>
+
+    <!-- 公司介绍 -->
+    <RelativeLayout
+        android:id="@+id/companyIntroduce"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:id="@+id/gsjs_text"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/gsjs"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/companyIntroduce"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:id="@+id/changeToNextPage_6"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+
+    <!-- 功能介绍 -->
+    <RelativeLayout
+        android:id="@+id/functionIntroduce"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:id="@+id/gnjs"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/gnjs"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/functionIntroduce"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+    <!-- 欢迎页 -->
+    <RelativeLayout
+        android:id="@+id/welcomePage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/hyy"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/welcomePage"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <!-- 使用协议 -->
+    <RelativeLayout
+        android:id="@+id/usingProtocol"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/syxy"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/usingProtocol"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    <!-- 功能介绍 -->
+    <RelativeLayout
+        android:id="@+id/toRating"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/qpf"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/toRating"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <ImageView
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+</LinearLayout>

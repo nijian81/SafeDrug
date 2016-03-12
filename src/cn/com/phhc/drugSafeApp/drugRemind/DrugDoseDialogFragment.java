@@ -1,0 +1,200 @@
+package cn.com.phhc.drugSafeApp.drugRemind;
+
+/**
+ * 添加药品界面，选择服药剂量
+ */
+
+import android.app.DialogFragment;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+
+/**
+ * Created by lenovo on 2015/2/27.
+ */
+public class DrugDoseDialogFragment extends DialogFragment {
+
+	EditText num;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName, rightShow = "片", drugDose = "", productDrugID = "";
+	ConfirmInterface listener;
+	NumberPicker desc;
+	TextView cancel, save;
+
+	public static DrugDoseDialogFragment newInstance(String sex) {
+		DrugDoseDialogFragment frag = new DrugDoseDialogFragment();
+		Bundle args = new Bundle();
+		args.putString("sex", sex);
+		frag.setArguments(args);
+		return frag;
+	}
+
+	// 定制fragmentDialog弹出动作
+	@Override
+	public void onActivityCreated(Bundle arg0) {
+		super.onActivityCreated(arg0);
+		getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+	}
+
+	public interface ConfirmInterface {
+		public void onConfirmInterface(String drugDose, String drugDoseUnit);
+	}
+
+	public void setConfirmInterface(ConfirmInterface listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+
+		databaseName = "drug_info";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.drug_dose_dialog, container,
+				false);
+
+		getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+		String left;
+		int right;
+		drugDose = getArguments().getString("drugDose");
+		productDrugID = getArguments().getString("productDrugID");
+		String frequencyParams = drugDose;
+		if (frequencyParams.length() == 0) {
+			left = "";
+			right = 0;
+		} else {
+			String[] drugDoseArray = frequencyParams.split(" ");
+			left = drugDoseArray[0];
+			right = 0;
+		}
+
+		// 左边的picker
+		num = (EditText) rootView.findViewById(R.id.num);
+		num.setText(left);
+		// 右边的Picker
+		desc = (NumberPicker) rootView.findViewById(R.id.desc);
+		db = databaseHelper.getWritableDatabase();
+		String sql = "select doseUnit from drugDoseFormatTable where productDrugID = '"
+				+ productDrugID + "'";
+		Cursor cursor = db.rawQuery(sql, null);
+		int i = 0;
+		int size = cursor.getCount();
+		final String[] values2;
+		if (size == 0) {
+			String sql2 = "select doseUnit from drugDoseUnitTable order by doseOrder desc";
+			Cursor cursor2 = db.rawQuery(sql2, null);
+			values2 = new String[139];
+			while (cursor2.moveToNext()) {
+				values2[i++] = cursor2.getString(0);
+			}
+		} else {
+			values2 = new String[size];
+			while (cursor.moveToNext()) {
+				values2[i++] = cursor.getString(0);
+			}
+		}
+		desc.setDisplayedValues(values2);
+		desc.setMaxValue(values2.length - 1);
+		desc.setMinValue(0);
+		desc.setValue(right);
+		desc.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+		desc.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+
+			@Override
+			public void onValueChange(NumberPicker picker, int oldVal,
+					int newVal) {
+				rightShow = values2[newVal];
+			}
+		});
+		rightShow = values2[right];
+		db.close();
+		Window window = getDialog().getWindow();
+		window.setGravity(Gravity.BOTTOM);
+		// 保存
+		save = (TextView) rootView.findViewById(R.id.save);
+		save.setOnClickListener(new MyClickSaveListener());
+		// 取消
+		cancel = (TextView) rootView.findViewById(R.id.cancel);
+		cancel.setOnClickListener(new MyClickCancelListener());
+
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+	}
+
+	// 点击保存监视器 尼见 2015-03-03
+	class MyClickSaveListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 如果不输入则什么也不保存
+			if (num.getText().toString().length() == 0) {
+
+				// 显示或者隐藏输入法
+				InputMethodManager imm = (InputMethodManager) getActivity()
+						.getSystemService(getActivity().INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(num.getWindowToken(), 0);
+				dismiss();
+			} else {
+
+				// 显示或者隐藏输入法
+				InputMethodManager imm = (InputMethodManager) getActivity()
+						.getSystemService(getActivity().INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(num.getWindowToken(), 0);
+				listener.onConfirmInterface(num.getText().toString(), rightShow);
+				dismiss();
+			}
+
+		}
+	}
+
+	// 点击取消监视器 尼见 2015-03-03
+	class MyClickCancelListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			InputMethodManager inputMethodManager = (InputMethodManager) getActivity()
+					.getSystemService(getActivity().INPUT_METHOD_SERVICE);
+			inputMethodManager.hideSoftInputFromWindow(num.getWindowToken(), 0);
+			dismiss();
+		}
+	}
+
+}

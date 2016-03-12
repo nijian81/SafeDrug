@@ -1,0 +1,847 @@
+package cn.com.phhc.drugSafeApp.myAccount;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import cn.com.phhc.drugSafeApp.R;
+import cn.com.phhc.drugSafeApp.utils.CreateSQLiteDatabase;
+import cn.com.phhc.drugSafeApp.utils.PersonalInformation;
+
+import java.util.ArrayList;
+
+public class ModifyMemberInformationFragment extends Fragment {
+
+	Boolean isNeedToSave = false; // 是否需要去保存，“true”表示需要保存，“false”表示不需要保存
+	ArrayList<PersonalInformation> list, listFromRelaxTime;
+	PersonalInformation personalInformation;
+	String sysUserID = null;
+	ImageButton back;
+	FamilyMemberManageFragment familyMemberManageFragment;
+	MyAccountFragment myAccountFragment;
+	CreateSQLiteDatabase databaseHelper;
+	SQLiteDatabase db;
+	String databaseName, portrait_database = "", honeyName_database = "",
+			sex_database = "", cellphoneNum_database = "",
+			birthday_database = "", itemName;
+	TextView text_under_portrait, honey_name_text_view, sex_text_view,
+			cellphone_text_view, birthday_text_view, save, title;
+	ImageView portraitImage;
+	RelativeLayout portrait, honey_name, sex, cellphone, birthday, relax_time,
+			delete;
+	int year_database, month_database, day_database;
+	int isMySelf;
+	// 以下的参数用于和数据库做对比，来提示用户是否保存
+	String getupTimeParam = "", breakfastTimeParam = "", lunchTimeParam = "",
+			dinnerTimeParam = "", sleepTimeParam = "";
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		databaseName = "LocalDrugMessage";
+		databaseHelper = new CreateSQLiteDatabase(getActivity(), databaseName,
+				null, 1);
+		db = databaseHelper.getWritableDatabase();
+		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		Bundle bundle = this.getArguments();
+		// isMySelf字段相当于数据库中isFamily
+		isMySelf = bundle.getInt("isMyself");
+		itemName = bundle.getString("name", "");
+		View rootView = inflater.inflate(R.layout.modify_member_information,
+				container, false);
+		// 初始化个人信息的实体
+		personalInformation = new PersonalInformation();
+		listFromRelaxTime = new ArrayList<>();
+		listFromRelaxTime = (ArrayList) bundle
+				.getCharSequenceArrayList("PersonalInformation");
+		String sql2 = "select * from MemberInfoTable where name = '" + itemName
+				+ "'";
+		Cursor cursor2 = db.rawQuery(sql2, null);
+		while (cursor2.moveToNext()) {
+			personalInformation.setPortrait(cursor2.getString(3));
+			personalInformation.setHoneyName(cursor2.getString(1));
+			personalInformation.setSex(cursor2.getString(5));
+			personalInformation.setCellphone(cursor2.getString(4));
+			personalInformation.setBirthday(cursor2.getString(6));
+
+			personalInformation.setGetupTime(cursor2.getString(7));
+			getupTimeParam = cursor2.getString(7);
+			personalInformation.setBreakfastTime(cursor2.getString(8));
+			breakfastTimeParam = cursor2.getString(8);
+			personalInformation.setLunchTime(cursor2.getString(9));
+			lunchTimeParam = cursor2.getString(9);
+			personalInformation.setDinnerTime(cursor2.getString(10));
+			dinnerTimeParam = cursor2.getString(10);
+			personalInformation.setSleepTime(cursor2.getString(11));
+			sleepTimeParam = cursor2.getString(11);
+		}
+		list = new ArrayList<>();
+		list.add(personalInformation);
+		if (bundle.getCharSequenceArrayList("PersonalInformation") != null) {
+			list = (ArrayList) bundle
+					.getCharSequenceArrayList("PersonalInformation");
+		}
+		// 标题
+		title = (TextView) rootView.findViewById(R.id.title);
+		title.setText(itemName + "的个人信息");
+		// 返回
+		back = (ImageButton) rootView.findViewById(R.id.back);
+		back.setOnClickListener(new MyClickBackListener());
+		// 头像
+		portrait = (RelativeLayout) rootView.findViewById(R.id.portrait);
+		portrait.setOnClickListener(new MyClickPortraitListener());
+		portraitImage = (ImageView) rootView.findViewById(R.id.portrait_image);
+		// 昵称
+		honey_name = (RelativeLayout) rootView.findViewById(R.id.honey_name);
+		honey_name.setOnClickListener(new MyClickHoneyNameListener());
+		honey_name_text_view = (TextView) rootView
+				.findViewById(R.id.honey_name_edit_text);
+		text_under_portrait = (TextView) rootView
+				.findViewById(R.id.text_under_portrait);
+		// 性别
+		sex = (RelativeLayout) rootView.findViewById(R.id.sex);
+		sex.setOnClickListener(new MyClickSexListener());
+		sex_text_view = (TextView) rootView.findViewById(R.id.sex_text_view);
+		// 手机号
+		cellphone = (RelativeLayout) rootView.findViewById(R.id.cellphone);
+		cellphone.setOnClickListener(new MyClickCellphoneNumListener());
+		cellphone_text_view = (TextView) rootView
+				.findViewById(R.id.cellphone_text_view);
+		// 生日
+		birthday = (RelativeLayout) rootView.findViewById(R.id.birthday);
+		birthday.setOnClickListener(new MyClickBirthdayListener());
+		birthday_text_view = (TextView) rootView
+				.findViewById(R.id.birthday_text_view);
+		// 作息时间
+		relax_time = (RelativeLayout) rootView.findViewById(R.id.relax_time);
+		relax_time.setOnClickListener(new MyClickRelaxTimeListener());
+		// 保存
+		save = (TextView) rootView.findViewById(R.id.save);
+		save.setOnClickListener(new MyClickSaveListener());
+		// 删除
+		delete = (RelativeLayout) rootView.findViewById(R.id.delete);
+		delete.setOnClickListener(new MyClickDeleteListener());
+		// 查数据库去初始化有关视图
+		String sql = "select * from MemberInfoTable where name = '" + itemName
+				+ "'";
+		db = databaseHelper.getWritableDatabase();
+		Cursor cursor = db.rawQuery(sql, null);
+		while (cursor.moveToNext()) {
+			honeyName_database = cursor.getString(1);
+			portrait_database = cursor.getString(3);
+			cellphoneNum_database = cursor.getString(4);
+			sex_database = cursor.getString(5);
+			birthday_database = cursor.getString(6);
+		}
+		if (!birthday_database.equals("")) {
+			String birthday_split[] = birthday_database.split("-");
+			year_database = Integer.parseInt(birthday_split[0]);
+			month_database = Integer.parseInt(birthday_split[1]);
+			day_database = Integer.parseInt(birthday_split[2]);
+		}
+		db.close();
+		switch (portrait_database) {
+		case "tx1":
+			portraitImage.setImageResource(R.drawable.tx1);
+			break;
+		case "tx2":
+			portraitImage.setImageResource(R.drawable.tx2);
+			break;
+		case "tx3":
+			portraitImage.setImageResource(R.drawable.tx3);
+			break;
+		case "tx4":
+			portraitImage.setImageResource(R.drawable.tx4);
+			break;
+		case "tx5":
+			portraitImage.setImageResource(R.drawable.tx5);
+			break;
+		case "tx6":
+			portraitImage.setImageResource(R.drawable.tx6);
+			break;
+		case "tx7":
+			portraitImage.setImageResource(R.drawable.tx7);
+			break;
+		case "tx8":
+			portraitImage.setImageResource(R.drawable.tx8);
+			break;
+		}
+		honey_name_text_view.setText(honeyName_database);
+		text_under_portrait.setText(honeyName_database);
+		sex_text_view.setText(sex_database);
+		cellphone_text_view.setText(cellphoneNum_database);
+		birthday_text_view.setText(birthday_database);
+
+		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
+
+	// 点击头像监视器 尼见 2015-03-03
+	class MyClickPortraitListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			SelectPortraitDialogFragment selectPortraitDialogFragment = SelectPortraitDialogFragment
+					.newInstance(1);
+			selectPortraitDialogFragment
+					.setConfirmInterface(new SelectPortraitDialogFragment.ConfirmInterface() {
+
+						@Override
+						public void onConfirmInterface(String portrait) {
+							if (portrait == null) {
+								portrait = "4";
+							}
+							switch (portrait) {
+							case "1":
+								portraitImage.setImageResource(R.drawable.tx1);
+								portrait_database = "tx1";
+								break;
+							case "2":
+								portraitImage.setImageResource(R.drawable.tx2);
+								portrait_database = "tx2";
+								break;
+							case "3":
+								portraitImage.setImageResource(R.drawable.tx3);
+								portrait_database = "tx3";
+								break;
+							case "4":
+								portraitImage.setImageResource(R.drawable.tx4);
+								portrait_database = "tx4";
+								break;
+							case "5":
+								portraitImage.setImageResource(R.drawable.tx5);
+								portrait_database = "tx5";
+								break;
+							case "6":
+								portraitImage.setImageResource(R.drawable.tx6);
+								portrait_database = "tx6";
+								break;
+							case "7":
+								portraitImage.setImageResource(R.drawable.tx7);
+								portrait_database = "tx7";
+								break;
+							case "8":
+								portraitImage.setImageResource(R.drawable.tx8);
+								portrait_database = "tx8";
+								break;
+							default:
+								portraitImage.setImageResource(R.drawable.tx1);
+								portrait_database = "tx1";
+								break;
+							}
+						}
+					});
+			selectPortraitDialogFragment.show(getActivity()
+					.getFragmentManager(), "selectPortraitDialogFragment");
+
+		}
+
+	}
+
+	// 点击昵称监视器 尼见 2015-03-03
+	class MyClickHoneyNameListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			ChangeHoneyNameDialogFragment changeHoneyNameDialogFragment = ChangeHoneyNameDialogFragment
+					.newInstance(1);
+			changeHoneyNameDialogFragment
+					.setConfirmInterface(new ChangeHoneyNameDialogFragment.ConfirmInterface() {
+
+						@Override
+						public void onConfirmInterface(String honeyName) {
+							honeyName_database = honeyName;
+							text_under_portrait.setText(honeyName);
+							honey_name_text_view.setText(honeyName);
+						}
+					});
+			changeHoneyNameDialogFragment.show(getActivity()
+					.getFragmentManager(), "selectPortraitDialogFragment");
+
+		}
+	}
+
+	// 点击返回监视器 尼见 2015-03-03
+	class MyClickBackListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 在这里去判断是否修改了个人信息没有保存直接返回 尼见 2015-04-17
+			if (!personalInformation.getPortrait().equals(portrait_database)) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getHoneyName().equals(
+					honey_name_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getSex().equals(
+					sex_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getCellphone().equals(
+					cellphone_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getBirthday().equals(
+					birthday_text_view.getText().toString())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getGetupTime().equals(
+					list.get(0).getGetupTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getBreakfastTime().equals(
+					list.get(0).getBreakfastTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getLunchTime().equals(
+					list.get(0).getLunchTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getDinnerTime().equals(
+					list.get(0).getDinnerTime())) {
+				isNeedToSave = true;
+			}
+			if (!personalInformation.getSleepTime().equals(
+					list.get(0).getSleepTime())) {
+				isNeedToSave = true;
+			}
+			if (isNeedToSave == true) {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithNeedToSave();
+						dialog.show();
+					}
+				});
+
+				return;
+			}
+			FragmentManager fragmentManager = getActivity()
+					.getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			familyMemberManageFragment = new FamilyMemberManageFragment();
+			fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+					R.anim.exit_to_right);
+			fragmentTransaction.replace(R.id.login_fragment,
+					familyMemberManageFragment, "familyMemberManageFragment");
+			fragmentTransaction.addToBackStack(null);
+			fragmentTransaction.commit();
+		}
+	}
+
+	// 点击性别监视器 尼见 2015-03-04
+	class MyClickSexListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			ChangeSexDialogFragment changeSexDialogFragment = ChangeSexDialogFragment
+					.newInstance("男");
+			changeSexDialogFragment
+					.setConfirmInterface(new ChangeSexDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(String sex) {
+							switch (sex) {
+							case "man":
+								sex_text_view.setText("男");
+								sex_database = "男";
+								break;
+							case "woman":
+								sex_text_view.setText("女");
+								sex_database = "女";
+								break;
+							}
+						}
+					});
+			Bundle bundle = new Bundle();
+			bundle.putString("sex", sex_database);
+			changeSexDialogFragment.setArguments(bundle);
+			changeSexDialogFragment.show(getActivity().getFragmentManager(),
+					"changeSexDialogFragment");
+
+		}
+	}
+
+	// 点击手机号监视器 尼见 2015-03-04
+	class MyClickCellphoneNumListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputCellphoneNumDialogFragment inputCellphoneNumDialogFragment = InputCellphoneNumDialogFragment
+					.newInstance(1);
+			inputCellphoneNumDialogFragment
+					.setConfirmInterface(new InputCellphoneNumDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(String cellphoneNum) {
+							cellphoneNum_database = cellphoneNum;
+							cellphone_text_view.setText(cellphoneNum);
+						}
+					});
+			inputCellphoneNumDialogFragment.show(getActivity()
+					.getFragmentManager(), "changeSexDialogFragment");
+
+		}
+	}
+
+	// 点击生日监视器 尼见 2015-03-04
+	class MyClickBirthdayListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			InputBirthdayDialogFragment inputBirthdayDialogFragment = InputBirthdayDialogFragment
+					.newInstance(year_database, month_database, day_database);
+			inputBirthdayDialogFragment
+					.setConfirmInterface(new InputBirthdayDialogFragment.ConfirmInterface() {
+
+						// 接口回调实现通信
+						@Override
+						public void onConfirmInterface(int year, int month,
+								int day) {
+							String month_show;
+							String day_show;
+							if (month <= 9) {
+								month_show = "0" + month;
+							} else {
+								month_show = Integer.toString(month);
+							}
+							if (day <= 9) {
+								day_show = "0" + day;
+							} else {
+								day_show = Integer.toString(day);
+							}
+							birthday_text_view.setText(year + "-" + month_show
+									+ "-" + day_show);
+							birthday_database = year + "-" + month_show + "-"
+									+ day_show;
+						}
+					});
+			if (birthday_database.equals("")) {
+				Bundle bundle = new Bundle();
+				bundle.putInt("year", 1991);
+				bundle.putInt("month", 01);
+				bundle.putInt("day", 01);
+				inputBirthdayDialogFragment.setArguments(bundle);
+				inputBirthdayDialogFragment.show(getActivity()
+						.getFragmentManager(), "inputBirthdayDialogFragment");
+			} else {
+				String date[] = birthday_database.split("-");
+				int year = Integer.parseInt(date[0]);
+				int month = Integer.parseInt(date[1]);
+				int day = Integer.parseInt(date[2]);
+				Bundle bundle = new Bundle();
+				bundle.putInt("year", year);
+				bundle.putInt("month", month);
+				bundle.putInt("day", day);
+				inputBirthdayDialogFragment.setArguments(bundle);
+				inputBirthdayDialogFragment.show(getActivity()
+						.getFragmentManager(), "inputBirthdayDialogFragment");
+			}
+		}
+	}
+
+	// 点击作息时间监视器 尼见 2015-03-04
+	class MyClickRelaxTimeListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			FragmentManager fragmentManager = getActivity()
+					.getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager
+					.beginTransaction();
+			RelaxTimeFragment relaxTimeFragment = new RelaxTimeFragment();
+			Bundle bundle = new Bundle();
+			bundle.putString("itemName", honeyName_database);
+			bundle.putInt("isMyself", 0);
+			bundle.putCharSequenceArrayList("PersonalInformation",
+					(ArrayList) list);
+			relaxTimeFragment.setArguments(bundle);
+			fragmentTransaction.setCustomAnimations(R.anim.enter_from_right,
+					R.anim.exit_to_left);
+			fragmentTransaction.replace(R.id.login_fragment, relaxTimeFragment,
+					"relaxTimeFragment");
+			fragmentTransaction.addToBackStack(null);
+			fragmentTransaction.commit();
+		}
+	}
+
+	// 点击保存家庭成员信息监视器 尼见 2015-03-04
+	class MyClickSaveListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+
+			// 昵称为空
+			if (honeyName_database.length() == 0) {
+
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithHoneyNameIsNULL();
+						dialog.show();
+					}
+				});
+
+				return;
+			}
+
+			db = databaseHelper.getWritableDatabase();
+			String sql2 = "select name from MemberInfoTable";
+			Cursor cursor = db.rawQuery(sql2, null);
+			while (cursor.moveToNext()) {
+				String name = cursor.getString(0);
+				if (honeyName_database.equals(itemName))
+					continue;
+				if (honeyName_database.equals(name)) {
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							AlertDialog dialog = getAlertDialogWithHoneyNameIsExist();
+							dialog.show();
+						}
+					});
+					return;
+				}
+			}
+			String sql;
+			if (list.size() == 0) {
+				sql = "update MemberInfoTable set photo ='" + portrait_database
+						+ "' , name ='" + honeyName_database + "' , sex ='"
+						+ sex_database + "' , tel ='" + cellphoneNum_database
+						+ "' , birth ='" + birthday_database + "' , getup ='"
+						+ "" + "' , breakfast ='" + "" + "' , lunch ='" + ""
+						+ "' , dinner ='" + "" + "' , sleep ='" + ""
+						+ "' where name ='" + itemName + "'";
+			} else {
+				sql = "update MemberInfoTable set photo ='" + portrait_database
+						+ "' , name ='" + honeyName_database + "' , sex ='"
+						+ sex_database + "' , tel ='" + cellphoneNum_database
+						+ "' , birth ='" + birthday_database + "' , getup ='"
+						+ list.get(0).getGetupTime() + "' , breakfast ='"
+						+ list.get(0).getBreakfastTime() + "' , lunch ='"
+						+ list.get(0).getLunchTime() + "' , dinner ='"
+						+ list.get(0).getDinnerTime() + "' , sleep ='"
+						+ list.get(0).getSleepTime() + "' where name ='"
+						+ itemName + "'";
+			}
+			db.execSQL(sql);
+			db.close();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					AlertDialog dialog = getAlertDialogWithSaveSuccess();
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	// 保存成功提示框 尼见 2015-03-04
+	AlertDialog getAlertDialogWithSaveSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("修改成员信息成功!");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				FragmentManager fragmentManager = getActivity()
+						.getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager
+						.beginTransaction();
+				familyMemberManageFragment = new FamilyMemberManageFragment();
+				fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+						R.anim.exit_to_right);
+				fragmentTransaction.replace(R.id.login_fragment,
+						familyMemberManageFragment,
+						"familyMemberManageFragment");
+				fragmentTransaction.commit();
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 昵称为空提示框提示框 尼见 2015-03-05
+	AlertDialog getAlertDialogWithHoneyNameIsNULL() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("昵称不能为空!");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 昵称已存在提示框提示框 尼见 2015-03-05
+	AlertDialog getAlertDialogWithHoneyNameIsExist() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("昵称已存在");
+		builder.setPositiveButton("确定", null);
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 提示用户是否保存修改的信息 尼见 2015-04-17
+	AlertDialog getAlertDialogWithNeedToSave() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				android.app.AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("成员信息已经修改，是否保存");
+		builder.setPositiveButton("保存", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				// 昵称为空
+				if (honeyName_database.length() == 0) {
+
+					getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							AlertDialog dialog = getAlertDialogWithHoneyNameIsNULL();
+							dialog.show();
+						}
+					});
+
+					return;
+				}
+
+				// 如果isMyself标志位是1，表示为更新个人信息，调用update语句更新数据库
+				db = databaseHelper.getWritableDatabase();
+				String sql2 = "select name from MemberInfoTable";
+				Cursor cursor = db.rawQuery(sql2, null);
+				while (cursor.moveToNext()) {
+					String name = cursor.getString(0);
+					if (honeyName_database.equals(itemName))
+						continue;
+					if (honeyName_database.equals(name)) {
+						getActivity().runOnUiThread(new Runnable() {
+							public void run() {
+								AlertDialog dialog = getAlertDialogWithHoneyNameIsExist();
+								dialog.show();
+							}
+						});
+						return;
+					}
+				}
+
+				// 如果isMyself标志位是1，表示为更新个人信息，调用update语句更新数据库
+				db = databaseHelper.getWritableDatabase();
+				String sql = "update MemberInfoTable set photo ='"
+						+ portrait_database + "' , name ='"
+						+ honeyName_database + "' , sex ='" + sex_database
+						+ "' , tel ='" + cellphoneNum_database + "' , birth ='"
+						+ birthday_database + "', getup ='"
+						+ list.get(0).getGetupTime() + "' , breakfast ='"
+						+ list.get(0).getBreakfastTime() + "' , lunch ='"
+						+ list.get(0).getLunchTime() + "' , dinner ='"
+						+ list.get(0).getDinnerTime() + "' , sleep ='"
+						+ list.get(0).getSleepTime() + "' where name ='"
+						+ itemName + "'";
+				db.execSQL(sql);
+				db.close();
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithSaveSuccess();
+						dialog.show();
+					}
+				});
+
+			}
+		});
+		builder.setNegativeButton("放弃", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				int isLogin = 0;
+				if (isMySelf == 1) {
+					try {
+						db = databaseHelper.getWritableDatabase();
+						String sql = "select * from anonymityRegister";
+						Cursor cursor = db.rawQuery(sql, null);
+						while (cursor.moveToNext()) {
+							isLogin = cursor.getInt(7);
+						}
+						// 如果标志flag为0则让其匿名注册，如果flag为1则拒绝匿名注册。
+						if (isLogin == 1) {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							myAccountFragment = new MyAccountFragment();
+							Bundle bundle = new Bundle();
+							bundle.putInt("flag", 1);
+							myAccountFragment.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									myAccountFragment, "myAccountFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						} else {
+							FragmentManager fragmentManager = getActivity()
+									.getSupportFragmentManager();
+							FragmentTransaction fragmentTransaction = fragmentManager
+									.beginTransaction();
+							myAccountFragment = new MyAccountFragment();
+							Bundle bundle = new Bundle();
+							bundle.putInt("flag", 0);
+							myAccountFragment.setArguments(bundle);
+							fragmentTransaction.setCustomAnimations(
+									R.anim.enter_from_left,
+									R.anim.exit_to_right);
+							fragmentTransaction.replace(R.id.login_fragment,
+									myAccountFragment, "myAccountFragment");
+							fragmentTransaction.addToBackStack(null);
+							fragmentTransaction.commit();
+						}
+						db.close();
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+				} else {
+					FragmentManager fragmentManager = getActivity()
+							.getSupportFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager
+							.beginTransaction();
+					familyMemberManageFragment = new FamilyMemberManageFragment();
+					fragmentTransaction.setCustomAnimations(
+							R.anim.enter_from_left, R.anim.exit_to_right);
+					fragmentTransaction.replace(R.id.login_fragment,
+							familyMemberManageFragment,
+							"familyMemberManageFragment");
+					fragmentTransaction.addToBackStack(null);
+					fragmentTransaction.commit();
+				}
+			}
+		});
+		builder.setCancelable(false);
+		android.app.AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 点击删除监视器 尼见 2015-03-11
+	class MyClickDeleteListener implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					AlertDialog dialog = getAlertDialogWithWhetherDeleteMember();
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	// 删除成功提示框 尼见 2015-03-11
+	AlertDialog getAlertDialogWithDeleteSuccess() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("删除成员信息成功!");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				FragmentManager fragmentManager = getActivity()
+						.getSupportFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager
+						.beginTransaction();
+				familyMemberManageFragment = new FamilyMemberManageFragment();
+				fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,
+						R.anim.exit_to_right);
+				fragmentTransaction.replace(R.id.login_fragment,
+						familyMemberManageFragment,
+						"familyMemberManageFragment");
+				fragmentTransaction.commit();
+			}
+		});
+		builder.setCancelable(false);
+		AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+	// 是否删除此成员 尼见 2015-04-20
+	AlertDialog getAlertDialogWithWhetherDeleteMember() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
+				AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+
+		builder.setTitle("提示");
+		builder.setMessage("是否删除此成员信息!");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				db = databaseHelper.getWritableDatabase();
+				String sql = "delete from MemberInfoTable where name = '"
+						+ itemName + "'";
+				db.execSQL(sql);
+				db.close();
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						AlertDialog dialog = getAlertDialogWithDeleteSuccess();
+						dialog.show();
+					}
+				});
+			}
+		});
+		builder.setNegativeButton("取消", null);
+		builder.setCancelable(false);
+		AlertDialog dialog = builder.create();
+		return dialog;
+	}
+
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="@string/myself"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:drawableRight="@drawable/head_name_image"
+            android:drawableTop="@drawable/tx1"
+            android:textSize="10sp" />
+
+        <TextView
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:layout_width="wrap_content"
+            android:drawableRight="@drawable/sanjiao"
+            android:drawablePadding="3dp"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="17dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:text="@string/byTime" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:background="#c3e3d8"
+        android:layout_width="match_parent">
+
+        <cn.com.phhc.drugSafeApp.utils.CalendarView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,49 @@
+package cn.com.phhc.drugSafeApp.utils;
+
+//用于药品查询界面列表项展示 尼见 2015-03-09
+public class CompanyItem {
+    String name;
+    String desc;
+    String basicDrug;
+    String productDrugId;
+
+    public CompanyItem(String name, String desc) {
+        this.name = name;
+        this.desc = desc;
+    }
+
+    public String getProductDrugId() {
+        return productDrugId;
+    }
+
+    public String getBasicDrug() {
+
+        return basicDrug;
+    }
+
+    public CompanyItem(String name, String desc, String basicDrug, String productDrugId) {
+        this.name = name;
+        this.desc = desc;
+        this.basicDrug = basicDrug;
+
+        this.productDrugId = productDrugId;
+    }
+
+    public CompanyItem(String desc, String basicDrug, String productDrugId) {
+        this.desc = desc;
+        this.basicDrug = basicDrug;
+        this.productDrugId = productDrugId;
+    }
+
+    public CompanyItem(String desc) {
+        this.desc = desc;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+}

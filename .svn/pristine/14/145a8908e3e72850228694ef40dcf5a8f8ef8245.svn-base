@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bj"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_height="@dimen/xmlTopTitleHeight"
+        android:layout_width="match_parent"
+        android:background="@color/xmlTopTitleBackgroundColor"
+        android:id="@+id/top">
+
+        <ImageButton
+            android:id="@+id/back_relax_time"
+            android:layout_height="@dimen/xmlTopLeftIconHeight"
+            android:layout_width="@dimen/xmlTopLeftIconWidth"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/xmlTopLeftIconMargin"
+            android:scaleType="centerInside"
+            android:onClick="login"
+            android:layout_centerInParent="true"
+            android:background="@null"
+            android:src="@drawable/fanhui" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/xmlTopTitleHeight"
+            android:gravity="center"
+            android:text="@string/relaxTime"
+            android:textColor="@color/xmlWhiteLineColor"
+            android:textSize="@dimen/xmlTopTitleTextSize" />
+
+    </RelativeLayout>
+
+    <!-- 起床 -->
+    <RelativeLayout
+        android:id="@+id/wakeUp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:id="@+id/gsjs_text"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/qcsj"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/wakeUp"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <TextView
+            android:id="@+id/wakeUpTime"
+            android:gravity="center"
+            android:text="07:00"
+            android:textSize="@dimen/xmlMiddleContentTextSize"
+            android:layout_marginRight="@dimen/xmlTimeWithJumpDistance"
+            android:layout_toLeftOf="@+id/one"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_width="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/one"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+
+    <!-- 早餐 -->
+    <RelativeLayout
+        android:id="@+id/breakfast"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:id="@+id/gnjs"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/zcsj"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/breakfast"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <TextView
+            android:id="@+id/breakfastTime"
+            android:gravity="center"
+            android:text="07:30"
+            android:textSize="@dimen/xmlMiddleContentTextSize"
+            android:layout_marginRight="@dimen/xmlTimeWithJumpDistance"
+            android:layout_toLeftOf="@+id/two"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_width="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/two"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+    <!-- 午餐 -->
+    <RelativeLayout
+        android:id="@+id/lunch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/wcsj"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/lunch"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <TextView
+            android:id="@+id/lunchTime"
+            android:gravity="center"
+            android:text="12:00"
+            android:textSize="@dimen/xmlMiddleContentTextSize"
+            android:layout_marginRight="@dimen/xmlTimeWithJumpDistance"
+            android:layout_toLeftOf="@+id/three"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_width="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/three"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+    <!-- 晚餐 -->
+    <RelativeLayout
+        android:id="@+id/dinner"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/wancansj"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/dinner"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <TextView
+            android:id="@+id/dinnerTime"
+            android:gravity="center"
+            android:text="18:00"
+            android:textSize="@dimen/xmlMiddleContentTextSize"
+            android:layout_marginRight="@dimen/xmlTimeWithJumpDistance"
+            android:layout_toLeftOf="@+id/four"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_width="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/four"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+    
+    <!-- 睡觉 -->
+    <RelativeLayout
+        android:id="@+id/sleep"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/xmlMiddleContentHeight"
+        android:background="@color/xmlMiddleContentBackgroundColor"
+        android:onClick="changePage">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_marginLeft="@dimen/xmlTextLayoutMarginLeft"
+            android:drawableLeft="@drawable/sjsj"
+            android:drawablePadding="@dimen/xmlTextDrawablePadding"
+            android:gravity="center"
+            android:text="@string/sleep"
+            android:textColor="@color/xmlMiddleContentTextColor"
+            android:textSize="@dimen/xmlMiddleContentTextSize" />
+
+        <TextView
+            android:id="@+id/sleepTime"
+            android:gravity="center"
+            android:text="22:00"
+            android:textSize="@dimen/xmlMiddleContentTextSize"
+            android:layout_marginRight="@dimen/xmlTimeWithJumpDistance"
+            android:layout_toLeftOf="@+id/five"
+            android:layout_height="@dimen/xmlMiddleContentHeight"
+            android:layout_width="wrap_content"
+            />
+
+        <ImageView
+            android:id="@id/five"
+            android:layout_width="@dimen/xmlMiddleRightIconWidth"
+            android:layout_height="@dimen/xmlMiddleRightIconHeight"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/xmlMiddleContentIconPaddingRight"
+            android:scaleType="centerInside"
+            android:src="@drawable/xiayiye" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/wsgrxx"
+        android:background="@null" />
+
+</LinearLayout>
